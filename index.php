@@ -21,6 +21,7 @@ $router->addRoute('changer_role', 'changer_role.php');
 $router->addRoute('supprimer_user', 'supprimer_user.php');
 // Route suppression d'arbres
 $router->addRoute('supprimer', 'supprimer.php');
+$router->addRoute('modifierarbre', 'modifierarbre.php');
 
 // Exécution
 $router->execute($_GET['page'] ?? 'accueil', $pdo);

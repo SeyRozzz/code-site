@@ -1,9 +1,8 @@
 <?php
-// admin.php
+// adminAdduser.php
 
-//  on autorise admin et superadmin
+// SÉCURITÉ : Seuls les admins/superadmins peuvent créer des gens
 if (!isset($_SESSION['role']) || ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'superadmin')) {
-    // Si ta pas le role on te met a l'accueil
     header("Location: index.php?page=accueil");
     exit();
 }
@@ -11,34 +10,28 @@ if (!isset($_SESSION['role']) || ($_SESSION['role'] !== 'admin' && $_SESSION['ro
 $message = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nom = $_POST['nom'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $mdpRaw = $_POST['password'] ?? '';
-    $role = $_POST['role'] ?? 'forestier';
+    $nom = $_POST['nom'];
+    $email = $_POST['email'];
+    $passwordBrut = $_POST['password']; // Le mot de passe en clair (ex: "1234")
+    $role = $_POST['role'];
 
-    if (!empty($nom) && !empty($email) && !empty($mdpRaw)) {
-        // on hache le mot de passe
-        $mdpHash = password_hash($mdpRaw, PASSWORD_DEFAULT);
-
-        //  on vérifie si l'email existe déjà
-        $check = $pdo->prepare("SELECT id FROM utilisateurs WHERE email = ?");
-        $check->execute([$email]);
+    if (!empty($nom) && !empty($email) && !empty($passwordBrut)) {
         
-        if ($check->fetch()) {
-            $message = "❌ Cet email est déjà utilisé.";
+        // HACHAGE SÉCURISÉ AVANT ENREGISTREMENT
+        $passwordHash = password_hash($passwordBrut, PASSWORD_DEFAULT);
+
+        // On insère le mot de passe HACHÉ ($passwordHash) et non le brut
+        $stmt = $pdo->prepare("INSERT INTO utilisateurs (nom, email, password, role) VALUES (?, ?, ?, ?)");
+        
+        if ($stmt->execute([$nom, $email, $passwordHash, $role])) {
+            header("Location: index.php?page=admin");
+            exit();
         } else {
-            // insertion dans la bdd
-            $stmt = $pdo->prepare("INSERT INTO utilisateurs (nom, email, mot_de_passe, role) VALUES (?, ?, ?, ?)");
-            if ($stmt->execute([$nom, $email, $mdpHash, $role])) {
-                header("Location: index.php?page=admin&msg=success");
-                exit();
-            } else {
-                $message = " Erreur lors de la création.";
-            }
+            $message = "Erreur : Cet email est peut-être déjà utilisé.";
         }
     } else {
-        $message = " Veuillez remplir tous les champs.";
+        $message = "Tous les champs sont obligatoires.";
     }
 }
 
-include 'adminAdduserVue.php';
+include 'adminAddUserVue.php';

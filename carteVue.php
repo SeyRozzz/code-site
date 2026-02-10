@@ -132,7 +132,6 @@
             width: 300px;
             outline: none;
             transition: 0.3s;
-            /* Icone loupe SVG intégrée en background */
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gray" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>');
             background-repeat: no-repeat;
             background-position: 12px center;
@@ -173,14 +172,19 @@
 
         .coord-text { font-family: 'Consolas', monospace; color: #888; font-size: 12px; }
 
+        /* Nouveaux styles pour les boutons d'action */
+        .btn-action {
+            display: inline-flex; justify-content: center; align-items: center;
+            width: 32px; height: 32px; border-radius: 6px; text-decoration: none; 
+            font-size: 13px; margin-right: 5px; transition: 0.2s;
+        }
+        .btn-edit { 
+            border: 1px solid var(--green); color: var(--green); background: rgba(46, 204, 113, 0.05);
+        }
+        .btn-edit:hover { background: var(--green); color: #000; }
+
         .btn-delete { 
-            color: var(--red); 
-            border: 1px solid rgba(231, 76, 60, 0.3); 
-            padding: 5px 10px; 
-            border-radius: 4px; 
-            font-size: 11px;
-            text-decoration: none;
-            transition: 0.3s;
+            border: 1px solid var(--red); color: var(--red); background: rgba(231, 76, 60, 0.05);
         }
         .btn-delete:hover { background: var(--red); color: white; }
 
@@ -247,7 +251,7 @@
                     <th onclick="sortTable(1)">Hauteur <i class="fas fa-sort"></i></th>
                     <th onclick="sortTable(2)">Diamètre <i class="fas fa-sort"></i></th>
                     <th>Coordonnées GPS</th>
-                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'superadmin')): ?>
+                    <?php if (isset($_SESSION['role'])): ?>
                         <th>Actions</th>
                     <?php endif; ?>
                 </tr>
@@ -261,13 +265,20 @@
                         <td><?= htmlspecialchars($row['diametre'] ?? '0') ?> cm</td>
                         <td class="coord-text">[<?= htmlspecialchars($row['latitude'] ?? '0') ?>, <?= htmlspecialchars($row['longitude'] ?? '0') ?>]</td>
                         
-                        <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'superadmin')): ?>
+                        <?php if (isset($_SESSION['role'])): ?>
                             <td>
-                                <a href="index.php?page=supprimer&id=<?= $row['id'] ?>" 
-                                   class="btn-delete" 
-                                   onclick="return confirm('Supprimer cet arbre définitivement ?')">
-                                   <i class="fas fa-trash"></i> Supprimer
+                                <a href="index.php?page=modifierarbre&id=<?= $row['id'] ?>" 
+                                   class="btn-action btn-edit" title="Modifier">
+                                   <i class="fas fa-pen"></i>
                                 </a>
+
+                                <?php if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'superadmin'): ?>
+                                    <a href="index.php?page=supprimer&id=<?= $row['id'] ?>" 
+                                       class="btn-action btn-delete" 
+                                       onclick="return confirm('Supprimer cet arbre définitivement ?')" title="Supprimer">
+                                       <i class="fas fa-trash"></i>
+                                    </a>
+                                <?php endif; ?>
                             </td>
                         <?php endif; ?>
                     </tr>
@@ -283,13 +294,12 @@
     // 1. Initialisation de la Carte
     var map = L.map('map').setView([48.297, 4.074], 15);
     
-    // CHANGEMENT : Retour aux tuiles STANDARD CLAIRES (OpenStreetMap)
+    // Tuiles STANDARD CLAIRES (OpenStreetMap)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19
     }).addTo(map);
 
-    // Fonction couleur
     function getColor(essence) {
         if (!essence) return "#2ecc71";
         var e = essence.toLowerCase().trim();
@@ -311,11 +321,10 @@
             if(!isNaN(lat) && !isNaN(lon)) {
                 var markerColor = getColor(t.essence);
                 
-                // Style des points : Bordure NOIRE (#000000) pour bien voir sur le fond blanc
                 var marker = L.circleMarker([lat, lon], {
                     radius: 8, 
                     fillColor: markerColor, 
-                    color: "#000000",    // <--- Bordure Noire ici
+                    color: "#000000",
                     weight: 1, 
                     opacity: 1, 
                     fillOpacity: 0.8
@@ -330,7 +339,6 @@
         });
     }
 
-    // Filtre Tableau
     function filterTable() {
         var input = document.getElementById("searchInput");
         var filter = input.value.toLowerCase();
@@ -343,7 +351,6 @@
         }
     }
 
-    // Tri Tableau
     function sortTable(n) {
         var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
         table = document.getElementById("treeTable");
