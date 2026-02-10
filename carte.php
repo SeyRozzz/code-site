@@ -6,11 +6,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Si pas connecté -> Oust !
-if (!isset($_SESSION['role'])) {
-    header("Location: index.php?page=login");
-    exit();
-}
 
 require_once 'config.php';
 
