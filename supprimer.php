@@ -1,14 +1,17 @@
 <?php
 // supprimer.php
 
-// Sécurité : On vérifie si l'utilisateur est admin (seul l'admin peut supprimer un arbre)
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: index.php?page=carte");
+// 1. SÉCURITÉ : Seuls les admins/superadmins peuvent supprimer
+if (!isset($_SESSION['role']) || ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'superadmin')) {
+    // Si un petit malin essaye, on le renvoie dehors
+    header("Location: index.php?page=carte&error=interdit");
     exit();
 }
 
-if (isset($_GET['id'])) {
-    $id = (int)$_GET['id'];
+$id = $_GET['id'] ?? null;
+
+if ($id) {
+    require_once 'config.php';
     $stmt = $pdo->prepare("DELETE FROM arbres WHERE id = ?");
     $stmt->execute([$id]);
 }
