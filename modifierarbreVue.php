@@ -44,6 +44,9 @@
         <h2><i class="fas fa-edit" style="color:var(--green);"></i> Modifier l'Arbre #<?= $arbre['id'] ?></h2>
         
         <form method="POST">
+            <!-- ✅ Token CSRF pour la sécurité -->
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+            
             <div class="input-group">
                 <label>Essence</label>
                 <i class="fas fa-leaf input-icon"></i>

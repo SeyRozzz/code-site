@@ -245,11 +245,16 @@
                             <div class="self-tag">Votre compte</div>
                         
                         <?php else: ?>
-                            <a href="index.php?page=supprimer_user&id=<?= $u['id'] ?>" 
-                            class="action-delete" 
-                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer <?= htmlspecialchars($u['nom']) ?> ?')">
-                            <i class="fas fa-trash-alt"></i> Supprimer
-                            </a>
+                            <!-- ✅ Formulaire POST avec CSRF pour la suppression -->
+                            <form method="POST" action="index.php?page=supprimer_user" style="display:inline;">
+                                <input type="hidden" name="user_id" value="<?= (int)$u['id'] ?>">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                                <button type="submit" class="action-delete" 
+                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer <?= htmlspecialchars($u['nom']) ?> ?')"
+                                    style="border:none; background:none; padding:0; cursor:pointer; text-decoration:none;">
+                                    <i class="fas fa-trash-alt"></i> Supprimer
+                                </button>
+                            </form>
                         <?php endif; ?>
                     </td>
                 </tr>

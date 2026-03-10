@@ -5,6 +5,12 @@ if (!isset($_SESSION['role']) || ($_SESSION['role'] !== 'admin' && $_SESSION['ro
     header("Location: index.php?page=accueil");
     exit();
 }
+
+// ✅ Générer token CSRF si absent
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // recupération de tous les comptes pour le panel
 $stmt = $pdo->query("SELECT id, nom, email, role FROM utilisateurs ORDER BY nom ASC");
 $users = $stmt->fetchAll();

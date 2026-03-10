@@ -182,6 +182,9 @@
         
         <form action="index.php?page=adminAdduser" method="POST">
             
+            <!-- ✅ Token CSRF pour la sécurité -->
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+            
             <div class="input-group">
                 <label>Nom complet</label>
                 <div class="input-wrapper">

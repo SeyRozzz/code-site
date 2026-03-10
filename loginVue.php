@@ -168,6 +168,9 @@
 
         <form method="POST">
             
+            <!-- ✅ Token CSRF pour la sécurité -->
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+            
             <div class="input-group">
                 <input type="email" name="email" placeholder="Email professionnel" required autocomplete="email">
                 <i class="fas fa-envelope"></i>

@@ -273,11 +273,16 @@
                                 </a>
 
                                 <?php if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'superadmin'): ?>
-                                    <a href="index.php?page=supprimer&id=<?= $row['id'] ?>" 
-                                       class="btn-action btn-delete" 
-                                       onclick="return confirm('Supprimer cet arbre définitivement ?')" title="Supprimer">
-                                       <i class="fas fa-trash"></i>
-                                    </a>
+                                    <!-- ✅ Formulaire POST avec CSRF pour la suppression -->
+                                    <form method="POST" action="index.php?page=supprimer" style="display:inline;">
+                                        <input type="hidden" name="id" value="<?= (int)$row['id'] ?>">
+                                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                                        <button type="submit" class="btn-action btn-delete" 
+                                            onclick="return confirm('Supprimer cet arbre définitivement ?')" title="Supprimer"
+                                            style="border:none; background:none; padding:0; cursor:pointer;">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 <?php endif; ?>
                             </td>
                         <?php endif; ?>

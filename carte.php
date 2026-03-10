@@ -9,6 +9,11 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once 'config.php';
 
+// ✅ Générer token CSRF si absent
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // 2. Gestion des paramètres de Tri et Recherche (100% PHP)
 $search = $_GET['q'] ?? '';           // Mot clé recherché
 $sort   = $_GET['sort'] ?? 'id';      // Colonne à trier

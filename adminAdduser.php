@@ -15,41 +15,62 @@ if (!isset($_SESSION['role']) || ($_SESSION['role'] !== 'admin' && $_SESSION['ro
     exit();
 }
 
+// Génération du token CSRF si absent
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $message = "";
 
 // 4. Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nom = trim($_POST['nom']);
-    $email = trim($_POST['email']);
-    $passwordBrut = $_POST['password']; // Le mot de passe en clair (ex: "1234")
-    $role = $_POST['role'];
+    // ✅ VÉRIFICATION CSRF
+    if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $message = "Erreur de sécurité : requête invalide.";
+    } else {
+        $nom = trim($_POST['nom'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $passwordBrut = $_POST['password'] ?? '';
+        $role = $_POST['role'] ?? 'forestier';
 
-    if (!empty($nom) && !empty($email) && !empty($passwordBrut)) {
-        
-        // --- HACHAGE SÉCURISÉ ---
-        // C'est ici que la magie opère : on crypte le mot de passe
-        $passwordHash = password_hash($passwordBrut, PASSWORD_DEFAULT);
+        // ✅ VALIDATION : Les champs sont remplis
+        if (empty($nom) || empty($email) || empty($passwordBrut)) {
+            $message = "Tous les champs sont obligatoires.";
+        }
+        // ✅ VALIDATION : Email valide
+        elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $message = "Adresse email invalide.";
+        }
+        // ✅ VALIDATION : Rôle autorisé (whitelist)
+        elseif (!in_array($role, ['forestier', 'admin'])) {
+            $message = "Rôle invalide.";
+        }
+        else {
+            try {
+                // Vérification si l'email existe déjà
+                $check = $pdo->prepare("SELECT id FROM utilisateurs WHERE email = ?");
+                $check->execute([$email]);
 
-        // Vérification si l'email existe déjà (pour éviter une erreur SQL moche)
-        $check = $pdo->prepare("SELECT id FROM utilisateurs WHERE email = ?");
-        $check->execute([$email]);
-
-        if ($check->rowCount() > 0) {
-            $message = "Erreur : Cet email est déjà utilisé.";
-        } else {
-            // Insertion avec le mot de passe HACHÉ
-            $stmt = $pdo->prepare("INSERT INTO utilisateurs (nom, email, mot_de_passe, role) VALUES (?, ?, ?, ?)");
-            
-            if ($stmt->execute([$nom, $email, $passwordHash, $role])) {
-                // Succès : retour au panel admin
-                header("Location: index.php?page=admin");
-                exit();
-            } else {
-                $message = "Erreur technique lors de l'enregistrement.";
+                if ($check->rowCount() > 0) {
+                    $message = "Erreur : Cet email est déjà utilisé.";
+                } else {
+                    // --- HACHAGE SÉCURISÉ ---
+                    $passwordHash = password_hash($passwordBrut, PASSWORD_DEFAULT);
+                    
+                    // Insertion avec le mot de passe HACHÉ
+                    $stmt = $pdo->prepare("INSERT INTO utilisateurs (nom, email, mot_de_passe, role) VALUES (?, ?, ?, ?)");
+                    $stmt->execute([$nom, $email, $passwordHash, $role]);
+                    
+                    // Succès : retour au panel admin
+                    header("Location: index.php?page=admin");
+                    exit();
+                }
+            } catch (PDOException $e) {
+                // Log l'erreur sans l'afficher
+                error_log("AdminAdduser - Erreur BDD: " . $e->getMessage());
+                $message = "Erreur technique. Contactez l'administrateur.";
             }
         }
-    } else {
-        $message = "Tous les champs sont obligatoires.";
     }
 }
 

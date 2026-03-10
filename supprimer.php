@@ -1,19 +1,37 @@
 <?php
 // supprimer.php
+// ✅ SÉCURISÉ : CSRF token + validation
 
-// 1. SÉCURITÉ : Seuls les admins/superadmins peuvent supprimer
+// 1. Vérifier session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once 'config.php';
+
+// 2. SÉCURITÉ : Seuls les admins/superadmins peuvent supprimer
 if (!isset($_SESSION['role']) || ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'superadmin')) {
-    // Si un petit malin essaye, on le renvoie dehors
     header("Location: index.php?page=carte&error=interdit");
     exit();
 }
 
-$id = $_GET['id'] ?? null;
-
-if ($id) {
-    require_once 'config.php';
-    $stmt = $pdo->prepare("DELETE FROM arbres WHERE id = ?");
-    $stmt->execute([$id]);
+// 3. ✅ Vérifier CSRF token (en POST)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        header("Location: index.php?page=carte&error=csrf");
+        exit();
+    }
+    
+    $id = (int)($_POST['id'] ?? 0);
+    
+    if ($id > 0) {
+        try {
+            $stmt = $pdo->prepare("DELETE FROM arbres WHERE id = ?");
+            $stmt->execute([$id]);
+        } catch (PDOException $e) {
+            error_log("Supprimer - Erreur BDD: " . $e->getMessage());
+        }
+    }
 }
 
 header("Location: index.php?page=carte");
