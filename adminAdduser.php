@@ -38,9 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "Erreur : Cet email est déjà utilisé.";
         } else {
             // Insertion avec le mot de passe HACHÉ
-            // Dans adminAdduser.php, vérifie ta requête INSERT :
-        $stmt = $pdo->prepare("INSERT INTO utilisateurs (nom, email, mot_de_passe, role) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$nom, $email, $passwordHash, $role]);
+            $stmt = $pdo->prepare("INSERT INTO utilisateurs (nom, email, mot_de_passe, role) VALUES (?, ?, ?, ?)");
             
             if ($stmt->execute([$nom, $email, $passwordHash, $role])) {
                 // Succès : retour au panel admin
