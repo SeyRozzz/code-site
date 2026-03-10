@@ -11,7 +11,6 @@ $router->addRoute('carte', 'carte.php');
 
 // Routes Authentification
 $router->addRoute('login', 'login.php');
-$router->addRoute('signup', 'signup.php'); 
 $router->addRoute('logout', 'logout.php');
 
 // Routes Administration
