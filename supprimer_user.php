@@ -1,69 +1,33 @@
 <?php
-/**
- * Contrôleur : supprimer_user.php
- * Empêche la suppression des comptes Superadmin.
- * ✅ SÉCURISÉ : Vérification CSRF + logique améliorée
- */
-
-// 1. Vérifier session
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+// supprimer_user.php
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 require_once 'config.php';
 
-// 2. Sécurité : Vérifier que c'est bien un admin ou superadmin qui agit
+// 1. Vérification Admin
 if (!isset($_SESSION['role']) || ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'superadmin')) {
-    header("Location: index.php?page=accueil");
+    exit("Accès refusé");
+}
+
+// 2. Vérification du Token de sécurité
+$token = $_GET['token'] ?? '';
+if ($token !== $_SESSION['csrf_token']) {
+    header("Location: index.php?page=admin&error=csrf");
     exit();
 }
 
-// 3. ✅ Vérifier le token CSRF
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        header("Location: index.php?page=admin&error=csrf");
+// 3. Suppression
+if (isset($_GET['id'])) {
+    $id = (int)$_GET['id'];
+    
+    // Empêcher de se supprimer soi-même
+    if ($id === (int)$_SESSION['user_id']) {
+        header("Location: index.php?page=admin&error=selfdelete");
         exit();
     }
-    
-    $idASupprimer = (int)($_POST['user_id'] ?? 0);
-    
-    if ($idASupprimer > 0) {
-        try {
-            // Récupérer les infos de la cible
-            $check = $pdo->prepare("SELECT id, role FROM utilisateurs WHERE id = ?");
-            $check->execute([$idASupprimer]);
-            $userCible = $check->fetch();
 
-            if ($userCible) {
-                // 🔒 PROTECTION : Ne pas supprimer un superadmin
-                if ($userCible['role'] === 'superadmin') {
-                    header("Location: index.php?page=admin&error=protection_superadmin");
-                    exit();
-                }
-                
-                // 🔒 Un admin standard ne peut supprimer que des "forestier"
-                // Un superadmin peut supprimer tout le monde (sauf lui-même = check au-dessus)
-                if ($_SESSION['role'] === 'admin' && $userCible['role'] === 'admin') {
-                    header("Location: index.php?page=admin&error=permission");
-                    exit();
-                }
-                
-                // 🔒 Impossible de se supprimer soi-même
-                if ($userCible['id'] === $_SESSION['id']) {
-                    header("Location: index.php?page=admin&error=cannot_delete_self");
-                    exit();
-                }
-                
-                // ✅ Tout va bien, on supprime
-                $stmt = $pdo->prepare("DELETE FROM utilisateurs WHERE id = ?");
-                $stmt->execute([$idASupprimer]);
-            }
-        } catch (PDOException $e) {
-            error_log("Supprimer_user - Erreur BDD: " . $e->getMessage());
-        }
-    }
+    $stmt = $pdo->prepare("DELETE FROM utilisateurs WHERE id = ?");
+    $stmt->execute([$id]);
 }
 
-// Retour au panel
-header("Location: index.php?page=admin");
+header("Location: index.php?page=admin&success=deleted");
 exit();
