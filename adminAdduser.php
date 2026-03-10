@@ -47,28 +47,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         else {
             try {
-                // Vérification si l'email existe déjà
-                $check = $pdo->prepare("SELECT id FROM utilisateurs WHERE email = ?");
-                $check->execute([$email]);
-
-                if ($check->rowCount() > 0) {
+                // --- HACHAGE SÉCURISÉ ---
+                $passwordHash = password_hash($passwordBrut, PASSWORD_DEFAULT);
+                
+                // Insertion avec le mot de passe HACHÉ
+                $stmt = $pdo->prepare("INSERT INTO utilisateurs (nom, email, mot_de_passe, role) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$nom, $email, $passwordHash, $role]);
+                
+                // Succès : retour au panel admin
+                header("Location: index.php?page=admin");
+                exit();
+            } catch (PDOException $e) {
+                // ✅ Vérifier si c'est une violation de contrainte UNIQUE (error code 23000)
+                if (strpos($e->getMessage(), '1062') !== false || strpos($e->getMessage(), 'Duplicate') !== false) {
                     $message = "Erreur : Cet email est déjà utilisé.";
                 } else {
-                    // --- HACHAGE SÉCURISÉ ---
-                    $passwordHash = password_hash($passwordBrut, PASSWORD_DEFAULT);
-                    
-                    // Insertion avec le mot de passe HACHÉ
-                    $stmt = $pdo->prepare("INSERT INTO utilisateurs (nom, email, mot_de_passe, role) VALUES (?, ?, ?, ?)");
-                    $stmt->execute([$nom, $email, $passwordHash, $role]);
-                    
-                    // Succès : retour au panel admin
-                    header("Location: index.php?page=admin");
-                    exit();
+                    // Autres erreurs BDD
+                    error_log("AdminAdduser - Erreur BDD: " . $e->getMessage());
+                    $message = "Erreur technique. Contactez l'administrateur.";
                 }
-            } catch (PDOException $e) {
-                // Log l'erreur sans l'afficher
-                error_log("AdminAdduser - Erreur BDD: " . $e->getMessage());
-                $message = "Erreur technique. Contactez l'administrateur.";
             }
         }
     }
