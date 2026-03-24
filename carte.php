@@ -5,29 +5,28 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once 'config.php';
 
-// Sécurité : Génération du token CSRF pour les formulaires de la vue
+// 1. SÉCURITÉ : Génération du token CSRF
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Récupération des paramètres de filtrage et tri
-$search       = $_GET['q']          ?? '';
-$sort         = $_GET['sort']       ?? 'arbres.id';
-$dir          = $_GET['dir']        ?? 'ASC';
+// 2. RÉCUPÉRATION DES FILTRES (via GET)
+$search       = $_GET['q'] ?? '';
+$sort         = $_GET['sort'] ?? 'arbres.id';
+$dir          = $_GET['dir'] ?? 'ASC';
 $filtreProjet = (int)($_GET['id_projet'] ?? 0);
 
-// Whitelisting des colonnes pour éviter les injections SQL via ORDER BY
-$allowedColumns = ['arbres.id', 'essence', 'hauteur', 'diametre', 'projets.nom'];
+// Whitelisting pour le tri (sécurité SQL)
+$allowedColumns = ['arbres.id', 'essence', 'hauteur', 'diametre', 'projet_nom', 'createur_nom'];
 if (!in_array($sort, $allowedColumns)) {
     $sort = 'arbres.id';
 }
 $dir = (strtoupper($dir) === 'DESC') ? 'DESC' : 'ASC';
 
-// 1. Récupérer la liste de tous les projets pour le menu déroulant (Filtre)
-$projets = $pdo->query("SELECT id, nom FROM projets ORDER BY nom ASC")->fetchAll();
+// 3. RÉCUPÉRATION DES PROJETS (pour le menu déroulant)
+$projets = $pdo->query("SELECT id, nom FROM projets ORDER BY nom ASC")->fetchAll(PDO::FETCH_ASSOC);
 
-// 2. Requête principale avec JOIN pour lier Arbres, Projets et Utilisateurs
-// On récupère le nom du projet et le nom du créateur de l'arbre
+// 4. CONSTRUCTION DE LA REQUÊTE PRINCIPALE (JOIN pour nom projet et créateur)
 $sql = "SELECT arbres.*, 
                projets.nom AS projet_nom, 
                utilisateurs.nom AS createur_nom
@@ -38,31 +37,32 @@ $sql = "SELECT arbres.*,
 $params = [];
 $where  = [];
 
-// Filtre de recherche textuelle (Essence ou ID)
+// Filtre par texte (essence)
 if (!empty($search)) {
-    $where[] = "(essence LIKE ? OR arbres.id LIKE ?)";
-    $params[] = "%$search%";
+    $where[] = "essence LIKE ?";
     $params[] = "%$search%";
 }
 
-// Filtre par projet spécifique
+// Filtre par projet (venant du menu déroulant)
 if ($filtreProjet > 0) {
     $where[] = "arbres.id_projet = ?";
     $params[] = $filtreProjet;
 }
 
-// Construction finale de la requête
+// Assemblage des conditions WHERE
 if (!empty($where)) {
     $sql .= " WHERE " . implode(" AND ", $where);
 }
 
+// Application du tri
 $sql .= " ORDER BY $sort $dir";
 
+// Exécution
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $arbres = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $nextDir = ($dir === 'ASC') ? 'DESC' : 'ASC';
 
-// Appel de la vue pour l'affichage
+// 5. CHARGEMENT DE LA VUE
 include 'carteVue.php';
