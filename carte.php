@@ -1,57 +1,45 @@
 <?php
-// carte.php
-
-// 1. Démarrage session et vérification connexion
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-
+if (session_status() === PHP_SESSION_NONE) session_start();
 require_once 'config.php';
 
-// ✅ Générer token CSRF si absent
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// 2. Gestion des paramètres de Tri et Recherche (100% PHP)
-$search = $_GET['q'] ?? '';           // Mot clé recherché
-$sort   = $_GET['sort'] ?? 'id';      // Colonne à trier
-$dir    = $_GET['dir'] ?? 'ASC';      // Direction (ASC ou DESC)
+$search     = $_GET['q']          ?? '';
+$sort       = $_GET['sort']       ?? 'id';
+$dir        = $_GET['dir']        ?? 'ASC';
+$filtreProjet = (int)($_GET['id_projet'] ?? 0);
 
-// Sécurité : Liste blanche des colonnes autorisées pour le tri (anti-injection SQL)
-$allowedColumns = ['id', 'essence', 'hauteur', 'diametre'];
-if (!in_array($sort, $allowedColumns)) {
-    $sort = 'id';
-}
+$allowedColumns = ['arbres.id', 'essence', 'hauteur', 'diametre', 'projets.nom'];
+if (!in_array($sort, $allowedColumns)) $sort = 'arbres.id';
+$dir = (strtoupper($dir) === 'DESC') ? 'DESC' : 'ASC';
 
-// Sécurité : Direction
-$dir = strtoupper($dir);
-if ($dir !== 'ASC' && $dir !== 'DESC') {
-    $dir = 'ASC';
-}
+// Récupérer tous les projets pour le filtre dropdown
+$projets = $pdo->query("SELECT id, nom FROM projets ORDER BY nom ASC")->fetchAll();
 
-// 3. Construction de la requête SQL Dynamique
-$sql = "SELECT * FROM arbres";
+// Requête principale avec JOIN
+$sql    = "SELECT arbres.*, projets.nom AS projet_nom
+           FROM arbres
+           LEFT JOIN projets ON arbres.id_projet = projets.id";
 $params = [];
+$where  = [];
 
-// A. Si recherche active
 if (!empty($search)) {
-    $sql .= " WHERE essence LIKE ? OR id LIKE ?";
+    $where[] = "(essence LIKE ? OR arbres.id LIKE ?)";
     $params[] = "%$search%";
     $params[] = "%$search%";
 }
-
-// B. Ajout du tri
+if ($filtreProjet > 0) {
+    $where[] = "arbres.id_projet = ?";
+    $params[] = $filtreProjet;
+}
+if (!empty($where)) $sql .= " WHERE " . implode(" AND ", $where);
 $sql .= " ORDER BY $sort $dir";
 
-// 4. Exécution
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
-$arbres = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// 5. Calcul de la direction inverse pour les liens de tri (pour la Vue)
+$arbres  = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $nextDir = ($dir === 'ASC') ? 'DESC' : 'ASC';
 
-// 6. Appel de la vue
 include 'carteVue.php';

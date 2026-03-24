@@ -115,7 +115,29 @@
 
         .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc; }
         .dot { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 2px rgba(255,255,255,0.5); }
-
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+    <div style="display:flex; gap:10px; align-items:center;">
+        <select onchange="window.location='index.php?page=carte&id_projet='+this.value"
+                style="background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.2);
+                       padding:10px 14px; border-radius:8px; color:white; outline:none; cursor:pointer;">
+            <option value="0" <?= $filtreProjet === 0 ? 'selected' : '' ?>>Tous les projets</option>
+            <?php foreach ($projets as $p): ?>
+                <option value="<?= $p['id'] ?>" <?= $filtreProjet === $p['id'] ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($p['nom']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <?php if (isset($_SESSION['role']) && in_array($_SESSION['role'], ['forestier','admin','superadmin'])): ?>
+        <a href="index.php?page=projets" class="btn btn-nav">
+            <i class="fas fa-folder-open"></i> Gérer les projets
+        </a>
+        <?php endif; ?>
+    </div>
+    <div class="search-wrapper" style="margin-bottom:0;">
+        <input type="text" id="searchInput" class="input-tech"
+               onkeyup="filterTable()" placeholder="Rechercher (essence, id...)">
+    </div>
+</div>
         /* --- BARRE DE RECHERCHE --- */
         .search-wrapper {
             display: flex;
@@ -248,6 +270,7 @@
             <thead>
                 <tr>
                     <th onclick="sortTable(0)">Essence <i class="fas fa-sort"></i></th>
+                    <th onclick="sortTable(1)">Projet</th> 
                     <th onclick="sortTable(1)">Hauteur <i class="fas fa-sort"></i></th>
                     <th onclick="sortTable(2)">Diamètre <i class="fas fa-sort"></i></th>
                     <th>Coordonnées GPS</th>
