@@ -14,7 +14,7 @@ $router->addRoute('logout', 'logout.php');
 
 // --- GESTION DES ARBRES ---
 $router->addRoute('ajouter', 'ajouter.php');           // Ajouté pour la création
-$router->addRoute('modifier', 'modifier.php');         // Mis à jour
+$router->addRoute('modifier', 'modifierarbre.php');         // Mis à jour
 $router->addRoute('supprimer', 'supprimer.php');       // Mis à jour (sécurisé)
 
 // --- GESTION DES PROJETS (Nouvelle BDD) ---

@@ -6,15 +6,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- CHARTE GRAPHIQUE --- */
+        /* --- TON STYLE GLASSMORPHISM (Conservé car parfait) --- */
         :root { 
-            --bg-dark: #0a0f0d; 
-            --green: #2ecc71; 
-            --green-hover: #27ae60; 
-            --txt-primary: #ffffff; 
-            --red: #e74c3c; 
+            --bg-dark: #0a0f0d; --green: #2ecc71; --green-hover: #27ae60; 
+            --txt-primary: #ffffff; --red: #e74c3c; 
         }
-        
         body { 
             font-family: 'Segoe UI', sans-serif; margin: 0; background-color: var(--bg-dark); color: var(--txt-primary);
             height: 100vh; display: flex; justify-content: center; align-items: center;
@@ -22,41 +18,27 @@
                         url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80') no-repeat center center/cover;
             background-attachment: fixed;
         }
-
         .form-card { 
             background: rgba(30, 30, 30, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             padding: 40px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); 
             width: 450px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.6);
         }
-
         h2 { margin: 0 0 25px 0; font-weight: 600; color: white; font-size: 1.4rem; }
-
         .input-group { position: relative; margin-bottom: 18px; text-align: left; }
         .input-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: #aaa; font-weight: 600; margin-left:5px; }
-        
         input, select { 
             width: 100%; padding: 12px 15px 12px 40px; background: rgba(0, 0, 0, 0.4); 
             border: 1px solid rgba(255, 255, 255, 0.1); color: white; border-radius: 8px; box-sizing: border-box; outline: none; transition: 0.3s;
         }
-
         input:focus, select:focus { border-color: var(--green); background: rgba(0, 0, 0, 0.6); box-shadow: 0 0 10px rgba(46, 204, 113, 0.2); }
-        
         .input-icon { position: absolute; left: 15px; top: 38px; color: #888; z-index: 5; }
-        .input-group:focus-within .input-icon { color: var(--green); }
-
         .btn-submit { 
             background: var(--green); color: #0a0f0d; border: none; width: 100%; padding: 14px; 
-            border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; transition: 0.3s;
-            font-size: 1rem;
+            border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; transition: 0.3s; font-size: 1rem;
         }
         .btn-submit:hover { background: var(--green-hover); color: white; transform: translateY(-2px); }
-
-        .row { display: flex; gap: 15px; } 
-        .col { flex: 1; }
-        
-        .btn-cancel { display: block; margin-top: 20px; color: #aaa; text-decoration: none; font-size: 13px; transition: 0.2s; }
-        .btn-cancel:hover { color: white; }
-
+        .row { display: flex; gap: 15px; } .col { flex: 1; }
+        .btn-cancel { display: block; margin-top: 20px; color: #aaa; text-decoration: none; font-size: 13px; }
         .alert { background: rgba(231, 76, 60, 0.1); color: var(--red); padding: 10px; border-radius: 8px; border: 1px solid var(--red); margin-bottom: 20px; font-size: 14px; }
     </style>
 </head>
@@ -69,7 +51,7 @@
         <?php endif; ?>
 
         <form method="POST">
-            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             
             <div class="input-group">
                 <label>Projet associé</label>
@@ -100,12 +82,12 @@
                 <div class="col input-group">
                     <label>Hauteur (m)</label>
                     <i class="fas fa-ruler-vertical input-icon"></i>
-                    <input type="number" step="0.1" name="hauteur" value="<?= htmlspecialchars($arbre['hauteur']) ?>">
+                    <input type="number" step="0.1" name="hauteur" value="<?= (float)$arbre['hauteur'] ?>">
                 </div>
                 <div class="col input-group">
                     <label>Diamètre (cm)</label>
                     <i class="fas fa-circle-notch input-icon"></i>
-                    <input type="number" step="1" name="diametre" value="<?= htmlspecialchars($arbre['diametre']) ?>">
+                    <input type="number" step="1" name="diametre" value="<?= (int)$arbre['diametre'] ?>">
                 </div>
             </div>
 
@@ -113,12 +95,12 @@
                 <div class="col input-group">
                     <label>Latitude</label>
                     <i class="fas fa-map-marker-alt input-icon" style="top:38px;"></i>
-                    <input type="text" name="latitude" value="<?= htmlspecialchars($arbre['latitude']) ?>" required style="padding-left:40px;">
+                    <input type="text" name="latitude" value="<?= $arbre['latitude'] ?>" required style="padding-left:40px;">
                 </div>
                 <div class="col input-group">
                     <label>Longitude</label>
                     <i class="fas fa-map-pin input-icon" style="top:38px;"></i>
-                    <input type="text" name="longitude" value="<?= htmlspecialchars($arbre['longitude']) ?>" required style="padding-left:40px;">
+                    <input type="text" name="longitude" value="<?= $arbre['longitude'] ?>" required style="padding-left:40px;">
                 </div>
             </div>
 
