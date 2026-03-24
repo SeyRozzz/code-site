@@ -32,6 +32,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id_projet = (int)($_POST['id_projet'] ?? 0);
         $id_user = $_SESSION['user_id']; // ID de l'utilisateur connecté
 
+        // 🔒 SÉCURITÉ : Vérifier que le forestier a accès à ce projet
+        if ($_SESSION['role'] === 'forestier') {
+            $stmt = $pdo->prepare("
+                SELECT COUNT(*) FROM projets_forestiers 
+                WHERE id_projet = ? AND id_forestier = ?
+            ");
+            $stmt->execute([$id_projet, $_SESSION['user_id']]);
+            $has_access = $stmt->fetchColumn();
+            
+            if (!$has_access) {
+                $message = "❌ Vous n'avez pas accès à ce projet.";
+                include 'ajouterVue.php';
+                exit();
+            }
+        }
+
         if (empty($essence) || empty($lat) || empty($lon) || $id_projet <= 0) {
             $message = "Veuillez remplir tous les champs obligatoires.";
         } else {
@@ -53,6 +69,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Récupérer la liste des projets pour le formulaire
-$projets = $pdo->query("SELECT id, nom FROM projets ORDER BY nom ASC")->fetchAll();
+// 🔒 SÉCURITÉ : Les forestiers voient seulement leurs projets affectés
+if ($_SESSION['role'] === 'forestier') {
+    $stmt = $pdo->prepare("
+        SELECT p.id, p.nom 
+        FROM projets p
+        JOIN projets_forestiers pf ON p.id = pf.id_projet
+        WHERE pf.id_forestier = ?
+        ORDER BY p.nom ASC
+    ");
+    $stmt->execute([$_SESSION['user_id']]);
+    $projets = $stmt->fetchAll();
+} else {
+    // Admins voient tous les projets
+    $projets = $pdo->query("SELECT id, nom FROM projets ORDER BY nom ASC")->fetchAll();
+}
 
 include 'ajouterVue.php';

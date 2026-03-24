@@ -166,7 +166,7 @@
             </div>
         <?php endif; ?>
 
-        <form method="POST">
+        <form method="POST" action="index.php?page=login">
             
             <!-- ✅ Token CSRF pour la sécurité -->
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">

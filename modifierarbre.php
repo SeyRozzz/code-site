@@ -32,8 +32,24 @@
         exit();
     }
 
-    // SÉCURITÉ : Seul le créateur ou un admin peut modifier (Audit de sécurité)
-    if ($_SESSION['role'] !== 'admin' && $_SESSION['user_id'] != $arbre['id_createur']) {
+    // 🔒 SÉCURITÉ : Vérifier les droits d'accès
+    if ($_SESSION['role'] === 'forestier') {
+        // Forestier: vérifier qu'il a accès au projet
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*) FROM projets_forestiers 
+            WHERE id_projet = ? AND id_forestier = ?
+        ");
+        $stmt->execute([$arbre['id_projet'], $_SESSION['user_id']]);
+        $has_access = $stmt->fetchColumn();
+        
+        if (!$has_access) {
+            header("Location: index.php?page=carte&error=acces_refuse");
+            exit();
+        }
+    } elseif ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'superadmin') {
+        // Admin: accès à tous les arbres
+    } else {
+        // Rôle inconnu: refuser
         header("Location: index.php?page=carte&error=acces_refuse");
         exit();
     }
@@ -70,6 +86,20 @@
     }
 
     // 3. Récupérer la liste des projets pour le formulaire (pour pouvoir changer l'arbre de projet)
-    $projets = $pdo->query("SELECT id, nom FROM projets")->fetchAll();
+    // 🔒 SÉCURITÉ : Forestiers ne voient que leurs projets
+    if ($_SESSION['role'] === 'forestier') {
+        $stmt = $pdo->prepare("
+            SELECT p.id, p.nom 
+            FROM projets p
+            JOIN projets_forestiers pf ON p.id = pf.id_projet
+            WHERE pf.id_forestier = ?
+            ORDER BY p.nom ASC
+        ");
+        $stmt->execute([$_SESSION['user_id']]);
+        $projets = $stmt->fetchAll();
+    } else {
+        // Admins voient tous les projets
+        $projets = $pdo->query("SELECT id, nom FROM projets")->fetchAll();
+    }
 
     include 'modifierarbreVue.php';

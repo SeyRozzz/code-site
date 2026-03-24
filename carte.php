@@ -20,7 +20,22 @@ if (empty($_SESSION['csrf_token'])) {
 $filtreProjet = (int)($_GET['id_projet'] ?? 0);
 
 // 📦 PROJETS
-$projets = $pdo->query("SELECT id, nom FROM projets ORDER BY nom ASC")->fetchAll(PDO::FETCH_ASSOC);
+// 🔒 SÉCURITÉ : Les forestiers ne voient que leurs projets affectés, les admins voient tous
+if ($_SESSION['role'] === 'forestier') {
+    // Forestier: voir uniquement ses projets
+    $projets = $pdo->prepare("
+        SELECT DISTINCT p.id, p.nom 
+        FROM projets p
+        JOIN projets_forestiers pf ON p.id = pf.id_projet
+        WHERE pf.id_forestier = ?
+        ORDER BY p.nom ASC
+    ");
+    $projets->execute([$_SESSION['user_id']]);
+    $projets = $projets->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    // Admin/Superadmin: voir tous les projets
+    $projets = $pdo->query("SELECT id, nom FROM projets ORDER BY nom ASC")->fetchAll(PDO::FETCH_ASSOC);
+}
 
 // 🌳 REQUÊTE ARBRES
 $sql = "SELECT arbres.*, 

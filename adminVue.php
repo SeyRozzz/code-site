@@ -188,6 +188,9 @@
     </div>
 
     <div style="display:flex; align-items:center; gap:20px;">
+        <a href="index.php?page=gererProjet" class="btn btn-add">
+            <i class="fas fa-folder-plus"></i> Gérer Projets
+        </a>
         <a href="index.php?page=adminAdduser" class="btn btn-add">
             <i class="fas fa-user-plus"></i> Nouvel Utilisateur
         </a>

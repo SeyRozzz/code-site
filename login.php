@@ -9,8 +9,9 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once 'config.php';
 
-// 2. Si l'utilisateur est déjà connecté, on le redirige vers la carte
-if (isset($_SESSION['role'])) {
+// 2. Si l'utilisateur est déjà connecté ET sa session est valide, on le redirige vers la carte
+// ✅ Vérifier AUSSI user_id pour éviter une boucle infinie de redirections
+if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
     header("Location: index.php?page=carte");
     exit();
 }
@@ -23,9 +24,15 @@ if (empty($_SESSION['csrf_token'])) {
 $erreur = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // 🔍 DEBUG - Vérification CSRF
+    error_log("DEBUG CSRF - POST token: " . (isset($_POST['csrf_token']) ? substr($_POST['csrf_token'], 0, 10) . "..." : "ABSENT"));
+    error_log("DEBUG CSRF - SESSION token: " . (isset($_SESSION['csrf_token']) ? substr($_SESSION['csrf_token'], 0, 10) . "..." : "ABSENT"));
+    error_log("DEBUG Session ID: " . session_id());
+    
     // ✅ Vérifier CSRF
     if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $erreur = "Erreur de sécurité : requête invalide.";
+        error_log("DEBUG - CSRF INVALIDE!");
     } else {
         $email = trim($_POST['email'] ?? '');
         $mdp = $_POST['password'] ?? '';
