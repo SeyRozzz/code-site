@@ -146,10 +146,6 @@
                     </option>
                 <?php endforeach; ?>
             </select>
-            
-            <?php if (isset($_SESSION['role']) && in_array($_SESSION['role'], ['forestier','admin','superadmin'])): ?>
-                <a href="index.php?page=ajouter" class="btn" style="background:var(--green); color:#000;"><i class="fas fa-plus"></i> Ajouter un arbre</a>
-            <?php endif; ?>
         </div>
 
         <input type="text" id="searchInput" class="input-tech" onkeyup="filterTable()" placeholder="🔍 Rechercher essence ou agent...">
@@ -214,7 +210,6 @@
         return "#2ecc71";
     }
 
-    // Récupération des données depuis le PHP (Corrigé avec les alias du contrôleur)
     var trees = <?= json_encode($arbres) ?>;
     trees.forEach(function(t) {
         if(t.latitude && t.longitude) {
