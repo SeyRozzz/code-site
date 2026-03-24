@@ -7,7 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once 'config.php';
 
 // 🔐 SÉCURITÉ : Seuls les admins/superadmins
-if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'superadmin'])) {
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'superadmin'])) {
     header("Location: index.php?page=accueil");
     exit();
 }
@@ -55,7 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $stmt->execute([$id_projet, $id_forestier]);
                 $message = "✅ Forestier affecté avec succès!";
             } catch (PDOException $e) {
-                if (strpos($e->getMessage(), 'Duplicate') !== false) {
+                if (strpos($e->getMessage(), '1146') !== false) {
+                    // Table n'existe pas
+                    $message = "⚠️ La table projets_forestiers n'existe pas encore. Créez-la d'abord avec install_projets_forestiers.php";
+                } elseif (strpos($e->getMessage(), 'Duplicate') !== false) {
                     $message = "❌ Ce forestier est déjà affecté à ce projet.";
                 } else {
                     $message = "❌ Erreur: " . $e->getMessage();
@@ -78,13 +81,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $stmt->execute([$id_affectation, $id_projet]);
                 $message = "✅ Forestier retiré du projet.";
             } catch (PDOException $e) {
-                $message = "❌ Erreur: " . $e->getMessage();
+                if (strpos($e->getMessage(), '1146') !== false) {
+                    // Table n'existe pas
+                    $message = "⚠️ La table projets_forestiers n'existe pas encore.";
+                } else {
+                    $message = "❌ Erreur: " . $e->getMessage();
+                }
             }
         }
     }
 }
 
 // 3. Récupérer les forestiers déjà affectés
+$forestiers_affectes = [];
 try {
     $stmt = $pdo->prepare("
         SELECT pf.id, u.id as user_id, u.nom, u.email
@@ -96,10 +105,12 @@ try {
     $stmt->execute([$id_projet]);
     $forestiers_affectes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    error_log("Erreur lecture forestiers affectés: " . $e->getMessage());
+    // Table n'existe pas encore, c'est normal
+    error_log("Table projets_forestiers n'existe pas encore: " . $e->getMessage());
 }
 
 // 4. Récupérer les forestiers NON affectés à ce projet
+$forestiers_libres = [];
 try {
     $ids_affectes = array_map(fn($f) => $f['user_id'], $forestiers_affectes);
     

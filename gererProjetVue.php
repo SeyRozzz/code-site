@@ -249,15 +249,15 @@
                         </div>
                         
                         <div class="projet-actions">
-                            <a href="index.php?page=affecterForestier&id=<?= $projet['id'] ?>" class="btn-small btn-affecter">
+                            <a href="index.php?page=affecterForestier&id=<?= (int)$projet['id'] ?>" class="btn-small btn-affecter">
                                 <i class="fas fa-user-plus"></i> Affecter
                             </a>
                             
-                            <form method="POST" style="display: inline;">
+                            <form method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr? Cela supprimera aussi tous les arbres.');">
                                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                                 <input type="hidden" name="action" value="supprimer">
-                                <input type="hidden" name="id_projet" value="<?= $projet['id'] ?>">
-                                <button type="submit" class="btn-small btn-delete" onclick="return confirm('Êtes-vous sûr? Cela supprimera aussi tous les arbres.');">
+                                <input type="hidden" name="id_projet" value="<?= (int)$projet['id'] ?>">
+                                <button type="submit" class="btn-small btn-delete">
                                     <i class="fas fa-trash"></i> Supprimer
                                 </button>
                             </form>

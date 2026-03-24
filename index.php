@@ -13,9 +13,10 @@ $router->addRoute('login', 'login.php');
 $router->addRoute('logout', 'logout.php');
 
 // --- GESTION DES ARBRES ---
-$router->addRoute('ajouter', 'ajouter.php');           // Ajouté pour la création
-$router->addRoute('modifier', 'modifierarbre.php');         // Mis à jour
-$router->addRoute('supprimer', 'supprimer.php');       // Mis à jour (sécurisé)
+$router->addRoute('ajouter', 'ajouter.php');                    // Ajout rapide
+$router->addRoute('ajouterArbreProjet', 'ajouterArbreProjet.php'); // 🆕 Ajout depuis le projet
+$router->addRoute('modifier', 'modifierarbre.php');
+$router->addRoute('supprimer', 'supprimer.php');
 
 // --- GESTION DES PROJETS (Nouvelle BDD) ---
 $router->addRoute('projets', 'ajouterProjet.php');

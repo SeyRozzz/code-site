@@ -7,7 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once 'config.php';
 
 // 🔐 SÉCURITÉ : Seuls les admins/superadmins
-if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'superadmin'])) {
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'superadmin'])) {
     header("Location: index.php?page=accueil");
     exit();
 }
@@ -50,9 +50,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         
         if ($id_projet > 0) {
             try {
-                // D'abord supprimer les affectations
-                $delete_affectations = $pdo->prepare("DELETE FROM projets_forestiers WHERE id_projet = ?");
-                $delete_affectations->execute([$id_projet]);
+                // D'abord supprimer les affectations (si la table existe)
+                try {
+                    $delete_affectations = $pdo->prepare("DELETE FROM projets_forestiers WHERE id_projet = ?");
+                    $delete_affectations->execute([$id_projet]);
+                } catch (PDOException $e) {
+                    // Table n'existe pas, on continue
+                }
                 
                 // Puis supprimer les arbres
                 $delete_arbres = $pdo->prepare("DELETE FROM arbres WHERE id_projet = ?");
@@ -75,13 +79,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 try {
     $stmt = $pdo->query("
         SELECT p.*, u.nom as createur_nom,
-               (SELECT COUNT(*) FROM projets_forestiers WHERE id_projet = p.id) as nb_forestiers,
                (SELECT COUNT(*) FROM arbres WHERE id_projet = p.id) as nb_arbres
         FROM projets p
         LEFT JOIN utilisateurs u ON p.id_createur = u.id
         ORDER BY p.id DESC
     ");
     $projets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Récupérer le nombre de forestiers affectés à chaque projet
+    foreach ($projets as &$p) {
+        try {
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM projets_forestiers WHERE id_projet = ?");
+            $stmt->execute([$p['id']]);
+            $p['nb_forestiers'] = $stmt->fetchColumn() ?: 0;
+        } catch (PDOException $e) {
+            // Table n'existe pas encore
+            $p['nb_forestiers'] = 0;
+        }
+    }
 } catch (PDOException $e) {
     error_log("Erreur lecture projets: " . $e->getMessage());
 }
