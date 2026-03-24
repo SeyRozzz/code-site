@@ -1,3 +1,9 @@
+<?php
+// Sécurité : s'assurer que la session est démarrée si ce n'est pas déjà fait par l'index
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -116,7 +122,10 @@
             <?php if (in_array($_SESSION['role'], ['admin', 'superadmin'])): ?>
                 <a href="index.php?page=admin" class="btn btn-admin"><i class="fas fa-cogs"></i> Panel Admin</a>
             <?php endif; ?>
-            <div class="user-pill"><i class="fas fa-user-circle"></i> <?= htmlspecialchars($_SESSION['nom'] ?? 'Utilisateur') ?></div>
+            <div class="user-pill">
+                <i class="fas fa-user-circle"></i> 
+                <?= htmlspecialchars($_SESSION['nom'] ?? 'Agent ONF') ?>
+            </div>
             <a href="index.php?page=logout" class="btn btn-nav" style="border-color:var(--red); color:var(--red);"><i class="fas fa-sign-out-alt"></i></a>
         <?php else: ?>
             <a href="index.php?page=login" class="btn btn-nav">Se connecter</a>
@@ -125,7 +134,6 @@
 </div>
 
 <div class="main-content">
-    
     <div class="map-wrapper"><div id="map"></div></div>
 
     <div class="legend-bar">
@@ -147,7 +155,6 @@
                 <?php endforeach; ?>
             </select>
         </div>
-
         <input type="text" id="searchInput" class="input-tech" onkeyup="filterTable()" placeholder="🔍 Rechercher essence ou agent...">
     </div>
 
@@ -161,7 +168,7 @@
                     <th onclick="sortTable(3)">H (m)</th>
                     <th onclick="sortTable(4)">D (cm)</th>
                     <th>GPS</th>
-                    <?php if (isset($_SESSION['role'])): ?><th>Actions</th><?php endif; ?>
+                    <?php if (isset($_SESSION['user_id'])): ?><th>Actions</th><?php endif; ?>
                 </tr>
             </thead>
             <tbody>
@@ -176,13 +183,13 @@
                     <td><?= htmlspecialchars($row['diametre']) ?></td>
                     <td style="font-family:monospace; font-size:11px; color:#888;">[<?= round($row['latitude'],4) ?>, <?= round($row['longitude'],4) ?>]</td>
                     
-                    <?php if (isset($_SESSION['role'])): ?>
+                    <?php if (isset($_SESSION['user_id'])): ?>
                         <td style="white-space:nowrap;">
                             <a href="index.php?page=modifier&id=<?= $row['id'] ?>" class="btn-action btn-edit"><i class="fas fa-pen"></i></a>
                             <?php if (in_array($_SESSION['role'], ['admin', 'superadmin'])): ?>
                                 <form method="POST" action="index.php?page=supprimer" style="display:inline;">
                                     <input type="hidden" name="id" value="<?= $row['id'] ?>">
-                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                     <button type="submit" class="btn-action btn-delete" onclick="return confirm('Supprimer cet arbre définitivement ?')"><i class="fas fa-trash"></i></button>
                                 </form>
                             <?php endif; ?>
