@@ -1,5 +1,5 @@
 <?php
-// ajouter.php
+// ajouterProjet.php - Ajouter un arbre
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($auth_ok) {
                     // Remplissage de la session
-                    $_SESSION['id'] = $user['id'];
+                    $_SESSION['user_id'] = $user['id'];
                     $_SESSION['nom'] = $user['nom'];
                     $_SESSION['role'] = $user['role'];
                     $_SESSION['email'] = $user['email'];
