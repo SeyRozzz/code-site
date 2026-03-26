@@ -1,6 +1,5 @@
     <?php
-    // modifier.php
-    // ✅ ADAPTÉ À LA NOUVELLE BDD : Gestion id_projet + id_createur
+    // modifierarbre.php
 
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -22,7 +21,6 @@
         exit();
     }
 
-    // 1. Récupération des infos de l'arbre et vérification des droits
     $stmt = $pdo->prepare("SELECT * FROM arbres WHERE id = ?");
     $stmt->execute([$id]);
     $arbre = $stmt->fetch();
@@ -32,7 +30,6 @@
         exit();
     }
 
-    // 🔒 SÉCURITÉ : Vérifier les droits d'accès
     if ($_SESSION['role'] === 'forestier') {
         // Forestier: vérifier qu'il a accès au projet
         $stmt = $pdo->prepare("
@@ -54,7 +51,6 @@
         exit();
     }
 
-    // 2. Traitement du formulaire (POST)
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $essence = trim($_POST['essence'] ?? '');
         $hauteur = trim($_POST['hauteur'] ?? '');
@@ -69,7 +65,6 @@
             $message = "Les coordonnées doivent être des nombres.";
         } else {
             try {
-                // ✅ UPDATE incluant le lien vers le projet (image_fde60b.png)
                 $sql = "UPDATE arbres 
                         SET essence=?, hauteur=?, diametre=?, latitude=?, longitude=?, id_projet=? 
                         WHERE id=?";
@@ -86,7 +81,6 @@
     }
 
     // 3. Récupérer la liste des projets pour le formulaire (pour pouvoir changer l'arbre de projet)
-    // 🔒 SÉCURITÉ : Forestiers ne voient que leurs projets
     if ($_SESSION['role'] === 'forestier') {
         $stmt = $pdo->prepare("
             SELECT p.id, p.nom 

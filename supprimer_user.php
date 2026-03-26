@@ -3,24 +3,21 @@
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 require_once 'config.php';
 
-// 1. Vérification Admin
 if (!isset($_SESSION['role']) || ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'superadmin')) {
     exit("Accès refusé");
 }
 
-// ✅ Générer token CSRF si absent
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// 2. Vérification du Token de sécurité
+if (isset($_GET['token'])) {
 $token = $_GET['token'] ?? '';
 if ($token !== $_SESSION['csrf_token']) {
     header("Location: index.php?page=admin&error=csrf");
     exit();
 }
 
-// 3. Suppression
 if (isset($_GET['id'])) {
     $id = (int)$_GET['id'];
     

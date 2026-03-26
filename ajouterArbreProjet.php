@@ -6,7 +6,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once 'config.php';
 
-// 🔐 PROTECTION : accès uniquement si connecté
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php?page=login");
     exit();
@@ -20,7 +19,6 @@ if ($id_projet <= 0) {
     exit();
 }
 
-// 🔒 SÉCURITÉ : Vérifier que le projet existe et que le user a accès
 try {
     $stmt = $pdo->prepare("SELECT p.id, p.nom FROM projets p WHERE p.id = ?");
     $stmt->execute([$id_projet]);
@@ -51,7 +49,6 @@ try {
     exit();
 }
 
-// ✅ Générer token CSRF
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -80,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([$id_projet, $_SESSION['user_id'], $essence, $hauteur, $diametre, $lat, $lon]);
                 
-                $message = "✅ Arbre ajouté avec succès!";
+                $message = "Arbre ajouté avec succès!";
                 // Rediriger après succès
                 header("Location: index.php?page=carte&id_projet=" . $id_projet . "&msg=succes_ajout");
                 exit();

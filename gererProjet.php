@@ -6,21 +6,17 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once 'config.php';
 
-// 🔐 SÉCURITÉ : Seuls les admins/superadmins
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'superadmin'])) {
     header("Location: index.php?page=accueil");
     exit();
 }
 
-// ✅ Générer token CSRF
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 $message = "";
 $projets = [];
-
-// 1. Traitement du formulaire AJOUTER PROJET
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'ajouter') {
     if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $message = "❌ Erreur de sécurité: token CSRF invalide";
@@ -33,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             try {
                 $stmt = $pdo->prepare("INSERT INTO projets (nom, id_createur) VALUES (?, ?)");
                 $stmt->execute([$nom, $_SESSION['user_id']]);
-                $message = "✅ Projet créé avec succès!";
+                $message = "Projet créé avec succès!";
             } catch (PDOException $e) {
                 $message = "❌ Erreur: " . $e->getMessage();
             }
@@ -41,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// 2. Traitement de la SUPPRESSION DE PROJET (admin only)
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'supprimer') {
     if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $message = "❌ Erreur de sécurité: token CSRF invalide";
@@ -66,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $stmt = $pdo->prepare("DELETE FROM projets WHERE id = ?");
                 $stmt->execute([$id_projet]);
                 
-                $message = "✅ Projet supprimé avec succès!";
+                $message = "Projet supprimé avec succès!";
             } catch (PDOException $e) {
                 error_log("Erreur suppression projet: " . $e->getMessage());
                 $message = "❌ Erreur lors de la suppression.";
@@ -75,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// 3. Récupérer tous les projets avec leurs infos
 try {
     $stmt = $pdo->query("
         SELECT p.*, u.nom as createur_nom,

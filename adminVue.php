@@ -2,200 +2,209 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Panel Administration - ONF</title>
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Administration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link rel="stylesheet" href="animations.css">
     <style>
-        /* --- CHARTE GRAPHIQUE (Cohérente avec l'accueil) --- */
-        :root { 
-            --bg-dark: #0a0f0d;
-            --green: #2ecc71;
-            --green-hover: #27ae60;
-            --gold: #f1c40f;
-            --red: #e74c3c;
-            --txt-primary: #ffffff;
-            --glass-bg: rgba(30, 30, 30, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.08);
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #40D969;
+            --bg: #1A1A1A;
+            --bg-secondary: #2D2D2D;
+            --text: #E8E8E8;
+            --text-secondary: #B0B0B0;
+            --border: #3D3D3D;
+            --error: #FF6B6B;
         }
-
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; 
-            background-color: var(--bg-dark);
-            color: var(--txt-primary);
-            /* Fond forêt immersif */
-            background: linear-gradient(135deg, rgba(5,10,8,0.95) 0%, rgba(15,25,20,0.90) 100%),
-                        url('https://source.unsplash.com/1600x900/?forest,dark') no-repeat center center/cover;
-            background-attachment: fixed; /* L'image reste fixe quand on scrolle */
-            min-height: 100vh;
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
         }
-
-        /* --- HEADER GLASS --- */
-        .header { 
-            background: rgba(20, 20, 20, 0.6); 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 15px 40px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 1px solid var(--glass-border);
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
             z-index: 100;
         }
-
-        h2 { margin: 0; font-weight: 600; letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px; }
         
-        /* --- BOUTONS --- */
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
         .btn {
-            text-decoration: none;
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
-            transition: 0.3s;
+            text-decoration: none;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
-
-        .btn-back { 
-            color: var(--txt-primary); 
-            border: 1px solid rgba(255,255,255,0.2); 
-        }
-        .btn-back:hover { background: rgba(255,255,255,0.1); border-color: white; }
-
-        .btn-add { 
-            background: var(--green); 
-            color: #0a0f0d; 
-            box-shadow: 0 0 15px rgba(46, 204, 113, 0.2);
-        }
-        .btn-add:hover { 
-            background: var(--green-hover); 
-            transform: translateY(-2px); 
-            color: white;
-        }
-
-        .user-pill {
-            background: rgba(255,255,255,0.1);
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-size: 13px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        /* --- CONTENEUR TABLEAU --- */
-        .container { width: 90%; max-width: 1200px; margin: 40px auto; }
-
-        .table-wrapper {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 15px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            overflow: hidden; /* Arrondir les coins du tableau */
-        }
-
-        table { width: 100%; border-collapse: collapse; }
-
-        th { 
-            background: rgba(0,0,0,0.3); 
-            color: var(--green); 
-            padding: 18px; 
-            text-align: left; 
-            text-transform: uppercase; 
-            font-size: 12px; 
-            letter-spacing: 1px;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        td { 
-            padding: 18px; 
-            border-bottom: 1px solid rgba(255,255,255,0.05); 
-            font-size: 14px;
-            vertical-align: middle;
-        }
-
-        tr:last-child td { border-bottom: none; }
         
-        tr:hover { background: rgba(255,255,255,0.02); }
-
-        /* --- BADGES ROLES --- */
-        .badge { 
-            padding: 6px 12px; 
-            border-radius: 50px; 
-            font-size: 11px; 
-            font-weight: 700; 
-            text-transform: uppercase; 
-            display: inline-block; 
+        .btn:hover {
+            background: var(--border);
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.85;
+        }
+        
+        .user-badge {
+            background: var(--bg-secondary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .table-wrapper {
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg);
+        }
+        
+        th {
+            background: var(--bg-secondary);
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
-        .badge-superadmin { 
-            background: rgba(155, 89, 182, 0.2); 
-            color: #d2b4de; 
-            border: 1px solid #9b59b6;
-            box-shadow: 0 0 10px rgba(155, 89, 182, 0.2);
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
         }
         
-        .badge-admin { 
-            background: rgba(241, 196, 15, 0.2); 
-            color: #f7dc6f; 
-            border: 1px solid #f1c40f;
+        tr:last-child td {
+            border-bottom: none;
         }
         
-        .badge-user { 
-            background: rgba(255, 255, 255, 0.1); 
-            color: #ccc; 
-            border: 1px solid #555;
+        tr:hover {
+            background: var(--bg-secondary);
         }
-
-        /* --- ACTIONS --- */
-        .action-delete {
-            color: var(--red);
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: bold;
-            padding: 5px 10px;
-            border: 1px solid rgba(231, 76, 60, 0.3);
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
             border-radius: 4px;
-            transition: 0.3s;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-admin {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--primary);
+        }
+        
+        .badge-forestier {
+            background: rgba(52, 152, 219, 0.1);
+            color: #007AFF;
+        }
+        
+        .badge-lecteur {
+            background: rgba(149, 165, 166, 0.1);
+            color: var(--text-secondary);
+        }
+        
+        .action-btn {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
         }
-        .action-delete:hover { 
-            background: rgba(231, 76, 60, 0.2); 
-            border-color: var(--red);
+        
+        .action-btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--text-secondary);
         }
-
-        .system-tag { color: var(--gold); font-size: 12px; display: flex; align-items: center; gap: 5px; opacity: 0.8; }
-        .self-tag { color: #888; font-style: italic; font-size: 12px; }
-
+        
+        .action-btn.delete {
+            color: var(--error);
+            border-color: #FFE5E5;
+        }
+        
+        .action-btn.delete:hover {
+            background: #FFE5E5;
+        }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div style="display:flex; align-items:center; gap:20px;">
-        <a href="index.php?page=carte" class="btn btn-back">
-            <i class="fas fa-arrow-left"></i> Carte
+    <h1>Administration</h1>
+    
+    <div class="header-actions">
+        <a href="index.php?page=gererProjet" class="btn btn-primary">
+            <i class="fas fa-folder-plus"></i> Gérer projets
         </a>
-        <h2><i class="fas fa-cogs" style="color:var(--green);"></i> Administration</h2>
-    </div>
-
-    <div style="display:flex; align-items:center; gap:20px;">
-        <a href="index.php?page=gererProjet" class="btn btn-add">
-            <i class="fas fa-folder-plus"></i> Gérer Projets
+        <a href="index.php?page=adminAdduser" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Nouvel utilisateur
         </a>
-        <a href="index.php?page=adminAdduser" class="btn btn-add">
-            <i class="fas fa-user-plus"></i> Nouvel Utilisateur
+        <a href="index.php?page=carte" class="btn">
+            <i class="fas fa-arrow-left"></i> Retour
         </a>
-        <div class="user-pill">
-            <i class="fas fa-user-circle"></i> <?= htmlspecialchars($_SESSION['nom'] ?? 'Admin') ?>
+        <div class="user-badge">
+            <i class="fas fa-user-circle"></i>
+            <?= htmlspecialchars($_SESSION['nom'] ?? 'Admin') ?>
         </div>
     </div>
 </div>
@@ -205,59 +214,36 @@
         <table>
             <thead>
                 <tr>
-                    <th><i class="fas fa-user"></i> Nom</th>
-                    <th><i class="fas fa-envelope"></i> Email</th>
-                    <th><i class="fas fa-id-badge"></i> Rôle</th>
-                    <th><i class="fas fa-tools"></i> Actions</th>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($users as $u): ?>
                 <tr>
-                    <td style="font-weight:600; color:white;"><?= htmlspecialchars($u['nom']) ?></td>
-                    
-                    <td style="color:#aaa;"><?= htmlspecialchars($u['email']) ?></td>
-                    
+                    <td style="font-weight: 500;"><?= htmlspecialchars($u['nom']) ?></td>
+                    <td style="color: var(--text-secondary);"><?= htmlspecialchars($u['email']) ?></td>
                     <td>
-                        <?php 
-                            $badgeClass = 'badge-user';
-                            $icon = 'fa-tree'; // Icone par défaut
-                            
-                            if($u['role'] === 'superadmin') { 
-                                $badgeClass = 'badge-superadmin'; 
-                                $icon = 'fa-crown';
-                            }
-                            elseif($u['role'] === 'admin') { 
-                                $badgeClass = 'badge-admin'; 
-                                $icon = 'fa-shield-alt';
-                            }
-                        ?>
-                        <span class="badge <?= $badgeClass ?>">
-                            <i class="fas <?= $icon ?>"></i> <?= htmlspecialchars($u['role']) ?>
+                        <span class="badge badge-<?= strtolower($u['role']) ?>">
+                            <?= htmlspecialchars($u['role']) ?>
                         </span>
                     </td>
-                    
                     <td>
-                        <?php 
-                        $monEmail = $_SESSION['email'] ?? ''; 
-                        
-                        if ($u['role'] === 'superadmin'): ?>
-                            <div class="system-tag"><i class="fas fa-lock"></i> Système</div>
-                        
-                        <?php elseif ($u['email'] === $monEmail): ?>
-                            <div class="self-tag">Votre compte</div>
-                        
-                        <?php else: ?>
-                            <!-- ✅ Formulaire POST avec CSRF pour la suppression -->
-                            <form method="POST" action="index.php?page=supprimer_user" style="display:inline;">
-                                <input type="hidden" name="user_id" value="<?= (int)$u['id'] ?>">
-                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                                <button type="submit" class="action-delete" 
-                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer <?= htmlspecialchars($u['nom']) ?> ?')"
-                                    style="border:none; background:none; padding:0; cursor:pointer; text-decoration:none;">
-                                    <i class="fas fa-trash-alt"></i> Supprimer
+                        <?php $isCurrentUser = ($u['email'] === ($_SESSION['email'] ?? '')); ?>
+                        <?php if ($u['role'] !== 'superadmin' && !$isCurrentUser): ?>
+                            <form method="POST" action="index.php?page=supprimer_user" style="display: inline;">
+                                <input type="hidden" name="id" value="<?= $u['id'] ?>">
+                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                                <button type="submit" class="action-btn delete delete-user" data-user="<?= htmlspecialchars($u['nom']) ?>">
+                                    <i class="fas fa-trash"></i>
                                 </button>
                             </form>
+                        <?php elseif ($isCurrentUser): ?>
+                            <span style="color: var(--text-secondary); font-size: 12px;">Votre compte</span>
+                        <?php else: ?>
+                            <span style="color: var(--text-secondary); font-size: 12px;">Système</span>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -266,6 +252,17 @@
         </table>
     </div>
 </div>
+
+<script src="app.js"></script>
+<script>
+    // Gérer les clics sur les boutons de suppression d'utilisateur
+    document.querySelectorAll('.delete-user').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const userName = this.dataset.user;
+            confirmDeleteUser(e, userName);
+        });
+    });
+</script>
 
 </body>
 </html>

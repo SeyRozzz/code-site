@@ -3,136 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajouter Utilisateur - ONF</title>
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Ajouter un utilisateur - Inventaire forestier</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { 
-            --bg-dark: #0a0f0d;
-            --green: #2ecc71;
-            --green-hover: #27ae60;
-            --txt-primary: #ffffff;
-            --txt-secondary: #a0a0a0;
-            --red: #e74c3c;
-        }
-
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; 
-            background-color: var(--bg-dark);
-            color: var(--txt-primary);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, rgba(5,10,8,0.95) 0%, rgba(15,25,20,0.85) 100%),
-                        url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80') no-repeat center center/cover;
-        }
-
-        .form-card { 
-            background: rgba(30, 30, 30, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 40px; 
-            border-radius: 20px; 
-            border: 1px solid rgba(255,255,255,0.08); 
-            width: 380px; 
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-            text-align: center;
-        }
-
-        .form-icon {
-            font-size: 40px;
-            color: var(--green);
-            margin-bottom: 15px;
-            filter: drop-shadow(0 0 10px rgba(46, 204, 113, 0.4));
-        }
-
-        h2 { margin: 0 0 30px 0; font-weight: 600; }
-
-        .input-group { position: relative; margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--txt-secondary); margin-left: 5px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        .input-wrapper { position: relative; }
-        .input-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666; }
-
-        input, select { 
-            width: 100%; padding: 12px 15px 12px 45px; 
-            background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); 
-            color: white; border-radius: 8px; box-sizing: border-box; outline: none;
+        :root {
+            --primary: #40D969;
+            --bg: #1A1A1A;
+            --bg-secondary: #2D2D2D;
+            --text: #E8E8E8;
+            --text-secondary: #B0B0B0;
+            --border: #3D3D3D;
+            --error: #FF6B6B;
         }
-
-        input:focus, select:focus { border-color: var(--green); background: rgba(0, 0, 0, 0.5); }
-
-        .btn-submit { 
-            width: 100%; background: var(--green); color: #0a0f0d; border: none; 
-            padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; 
-            transition: 0.3s; margin-top: 10px;
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 24px;
         }
-        .btn-submit:hover { background: var(--green-hover); color: white; transform: translateY(-2px); }
-
-        .btn-cancel { display: inline-block; margin-top: 20px; color: var(--txt-secondary); text-decoration: none; font-size: 14px; }
-        .btn-cancel:hover { color: white; }
-
-        .error { 
-            background: rgba(231, 76, 60, 0.1); color: var(--red); padding: 10px; 
-            border-radius: 8px; border: 1px solid rgba(231, 76, 60, 0.3);
-            margin-bottom: 20px; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 10px;
+        
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+        }
+        
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 24px;
+            transition: opacity 0.2s;
+        }
+        
+        .back:hover {
+            opacity: 0.7;
+        }
+        
+        .card {
+            background: var(--bg-secondary);
+            padding: 32px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 24px 0;
+        }
+        
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .message.error {
+            background: #FFE5E5;
+            color: var(--error);
+            border: 1px solid #FFE5E5;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: var(--bg);
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 4px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.85;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 16px;
+            width: auto;
+            padding: 8px 0;
+        }
+        
+        .btn-secondary:hover {
+            color: var(--text);
         }
     </style>
 </head>
 <body>
 
-    <div class="form-card">
-        <div class="form-icon"><i class="fas fa-user-plus"></i></div>
-        <h2>Créer un Compte</h2>
+<div class="container">
+    <a href="index.php?page=admin" class="back">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
+    
+    <div class="card">
+        <h1>Créer un utilisateur</h1>
         
-        <?php if(!empty($message)): ?>
-            <div class="error"><i class="fas fa-exclamation-circle"></i> <?= htmlspecialchars($message) ?></div>
+        <?php if (!empty($message)): ?>
+            <div class="message error">
+                <i class="fas fa-exclamation-circle"></i> 
+                <?= htmlspecialchars($message) ?>
+            </div>
         <?php endif; ?>
         
-        <form action="index.php?page=adminAdduser" method="POST">
+        <form method="POST">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
             
-            <div class="input-group">
+            <div class="form-group">
                 <label>Nom complet</label>
-                <div class="input-wrapper">
-                    <input type="text" name="nom" placeholder="Ex: Jean Dupont" required>
-                    <i class="fas fa-user"></i>
-                </div>
+                <input type="text" name="nom" placeholder="Ex: Jean Dupont" required>
             </div>
             
-            <div class="input-group">
-                <label>Adresse Email</label>
-                <div class="input-wrapper">
-                    <input type="email" name="email" placeholder="Ex: jean@onf.fr" required>
-                    <i class="fas fa-envelope"></i>
-                </div>
+            <div class="form-group">
+                <label>Adresse email</label>
+                <input type="email" name="email" placeholder="Ex: jean@example.fr" required>
             </div>
             
-            <div class="input-group">
+            <div class="form-group">
                 <label>Mot de passe</label>
-                <div class="input-wrapper">
-                    <input type="password" name="password" placeholder="••••••••" required>
-                    <i class="fas fa-lock"></i>
-                </div>
+                <input type="password" name="password" placeholder="••••••••" required>
             </div>
             
-            <div class="input-group">
-                <label>Attribution du Rôle</label>
-                <div class="input-wrapper">
-                    <select name="role">
-                        <option value="forestier">🌲 Forestier</option>
-                        <option value="admin">⚙️ Administrateur</option>
-                    </select>
-                    <i class="fas fa-id-badge"></i>
-                </div>
+            <div class="form-group">
+                <label>Rôle</label>
+                <select name="role" required>
+                    <option value="forestier">Agent forestier</option>
+                    <option value="admin">Administrateur</option>
+                </select>
             </div>
             
-            <button type="submit" class="btn-submit">Valider la création</button>
-            <a href="index.php?page=admin" class="btn-cancel">Annuler</a>
+            <button type="submit" class="btn btn-primary">Créer</button>
+            <a href="index.php?page=admin" class="btn-secondary">Annuler</a>
         </form>
     </div>
+</div>
 
 </body>
 </html>

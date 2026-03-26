@@ -1,21 +1,16 @@
 <?php
-// supprimer.php
-// ✅ SÉCURISÉ : CSRF token + validation
 
-// 1. Vérifier session
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 require_once 'config.php';
 
-// 2. SÉCURITÉ : Seuls les admins/superadmins peuvent supprimer
 if (!isset($_SESSION['role']) || ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'superadmin')) {
     header("Location: index.php?page=carte&error=interdit");
     exit();
 }
 
-// 3. ✅ Vérifier CSRF token (en POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         header("Location: index.php?page=carte&error=csrf");

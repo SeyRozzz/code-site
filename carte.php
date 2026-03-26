@@ -5,24 +5,18 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once 'config.php';
 
-// 🔐 PROTECTION : accès uniquement si connecté
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php?page=login");
     exit;
 }
 
-// 🛡️ CSRF (correct)
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// 🎯 FILTRE
 $filtreProjet = (int)($_GET['id_projet'] ?? 0);
 
-// 📦 PROJETS
-// 🔒 SÉCURITÉ : Les forestiers ne voient que leurs projets affectés, les admins voient tous
 if ($_SESSION['role'] === 'forestier') {
-    // Forestier: voir uniquement ses projets
     $projets = $pdo->prepare("
         SELECT DISTINCT p.id, p.nom 
         FROM projets p
@@ -33,11 +27,9 @@ if ($_SESSION['role'] === 'forestier') {
     $projets->execute([$_SESSION['user_id']]);
     $projets = $projets->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    // Admin/Superadmin: voir tous les projets
     $projets = $pdo->query("SELECT id, nom FROM projets ORDER BY nom ASC")->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// 🌳 REQUÊTE ARBRES
 $sql = "SELECT arbres.*, 
                projets.nom AS projet_nom, 
                utilisateurs.nom AS createur_nom

@@ -2,177 +2,181 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Ajouter un Arbre - <?= htmlspecialchars($projet['nom']) ?></title>
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter un arbre - Inventaire forestier</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         :root {
-            --bg-dark: #0a0f0d;
-            --green: #2ecc71;
-            --green-hover: #27ae60;
-            --txt-primary: #ffffff;
-            --red: #e74c3c;
+            --primary: #40D969;
+            --bg: #1A1A1A;
+            --bg-secondary: #2D2D2D;
+            --text: #E8E8E8;
+            --text-secondary: #B0B0B0;
+            --border: #3D3D3D;
+            --error: #FF6B6B;
         }
-
+        
         body {
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            background-color: var(--bg-dark);
-            color: var(--txt-primary);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 24px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .back {
+            display: inline-flex;
             align-items: center;
-            background: linear-gradient(135deg, rgba(5,10,8,0.95) 0%, rgba(15,25,20,0.85) 100%),
-                        url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80') no-repeat center center/cover;
-            background-attachment: fixed;
+            gap: 6px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 24px;
+            transition: opacity 0.2s;
         }
-
-        .form-card {
-            background: rgba(30, 30, 30, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 40px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.08);
-            width: 500px;
-            text-align: center;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+        
+        .back:hover {
+            opacity: 0.7;
         }
-
-        h2 {
-            margin: 0 0 10px 0;
-            font-weight: 600;
-            color: white;
+        
+        .card {
+            background: var(--bg-secondary);
+            padding: 32px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
-
-        .project-name {
-            color: var(--green);
-            font-size: 0.9rem;
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+        }
+        
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        
+        .message.success {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(52, 199, 89, 0.2);
+        }
+        
+        .message.error {
+            background: #FFE5E5;
+            color: var(--error);
+            border: 1px solid #FFE5E5;
+        }
+        
+        .form-group {
             margin-bottom: 20px;
-            opacity: 0.9;
         }
-
-        .input-group {
-            position: relative;
-            margin-bottom: 18px;
-            text-align: left;
-        }
-
-        .input-group label {
+        
+        label {
             display: block;
-            margin-bottom: 5px;
-            font-size: 0.85rem;
-            color: #aaa;
+            font-size: 14px;
             font-weight: 600;
-            margin-left: 5px;
+            margin-bottom: 8px;
         }
-
+        
         input, select {
             width: 100%;
-            padding: 12px 15px 12px 40px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
             border-radius: 8px;
-            box-sizing: border-box;
-            outline: none;
-            transition: 0.3s;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: var(--bg);
         }
-
+        
         input:focus, select:focus {
-            border-color: var(--green);
-            background: rgba(0, 0, 0, 0.6);
-            box-shadow: 0 0 10px rgba(46, 204, 113, 0.2);
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(64, 217, 105, 0.2);
         }
-
-        .input-icon {
-            position: absolute;
-            left: 15px;
-            top: 38px;
-            color: #888;
-            z-index: 5;
-        }
-
-        .btn-submit {
-            background: var(--green);
-            color: #0a0f0d;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: 0.3s;
-            font-size: 1rem;
-        }
-
-        .btn-submit:hover {
-            background: var(--green-hover);
-            color: white;
-            transform: translateY(-2px);
-        }
-
+        
         .row {
-            display: flex;
-            gap: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
-
-        .col {
-            flex: 1;
-        }
-
-        .btn-cancel {
-            display: block;
-            margin-top: 20px;
-            color: #aaa;
-            text-decoration: none;
-            font-size: 13px;
-        }
-
-        .btn-cancel:hover {
-            color: white;
-        }
-
-        .alert {
-            background: rgba(231, 76, 60, 0.1);
-            color: var(--red);
-            padding: 12px;
+        
+        .btn {
+            padding: 12px 16px;
             border-radius: 8px;
-            border: 1px solid var(--red);
-            margin-bottom: 20px;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 12px;
         }
-
-        .alert.success {
-            background: rgba(46, 204, 113, 0.1);
-            color: var(--green);
-            border-color: var(--green);
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.85;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text);
+            border: 1px solid var(--border);
+            margin-top: 8px;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border);
         }
     </style>
 </head>
 <body>
-    <div class="form-card">
-        <h2><i class="fas fa-plus-circle" style="color:var(--green);"></i> Ajouter un Arbre</h2>
-        <p class="project-name">📍 Projet: <?= htmlspecialchars($projet['nom']) ?></p>
 
+<div class="container">
+    <a href="index.php?page=carte&id_projet=<?= (int)$id_projet ?>" class="back">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
+    
+    <div class="card">
+        <h1>Ajouter un arbre</h1>
+        <div class="subtitle">Projet: <?= htmlspecialchars($projet['nom']) ?></div>
+        
         <?php if (!empty($message)): ?>
-            <div class="alert <?= strpos($message, '✅') ? 'success' : '' ?>">
-                <i class="fas <?= strpos($message, '✅') ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
+            <div class="message <?= strpos($message, '✅') !== false ? 'success' : 'error' ?>">
                 <?= htmlspecialchars($message) ?>
             </div>
         <?php endif; ?>
-
+        
         <form method="POST">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-
-            <div class="input-group">
+            
+            <div class="form-group">
                 <label>Essence</label>
-                <i class="fas fa-leaf input-icon"></i>
                 <select name="essence" required>
                     <option value="">-- Sélectionner une essence --</option>
                     <option value="Chêne">Chêne</option>
@@ -184,40 +188,38 @@
                     <option value="Autre">Autre</option>
                 </select>
             </div>
-
+            
             <div class="row">
-                <div class="col input-group">
+                <div class="form-group">
                     <label>Hauteur (m)</label>
-                    <i class="fas fa-ruler-vertical input-icon"></i>
                     <input type="number" step="0.1" name="hauteur" placeholder="0.0">
                 </div>
-                <div class="col input-group">
+                <div class="form-group">
                     <label>Diamètre (cm)</label>
-                    <i class="fas fa-circle-notch input-icon"></i>
                     <input type="number" step="0.1" name="diametre" placeholder="0.0">
                 </div>
             </div>
-
+            
             <div class="row">
-                <div class="col input-group">
+                <div class="form-group">
                     <label>Latitude</label>
-                    <i class="fas fa-location-dot input-icon"></i>
                     <input type="text" name="latitude" placeholder="48.297" required>
                 </div>
-                <div class="col input-group">
+                <div class="form-group">
                     <label>Longitude</label>
-                    <i class="fas fa-location-dot input-icon"></i>
                     <input type="text" name="longitude" placeholder="4.074" required>
                 </div>
             </div>
-
-            <button type="submit" class="btn-submit">
-                <i class="fas fa-save"></i> Enregistrer l'Arbre
+            
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Enregistrer
             </button>
-            <a href="index.php?page=carte&id_projet=<?= $id_projet ?>" class="btn-cancel">
-                ← Annuler
+            <a href="index.php?page=carte&id_projet=<?= (int)$id_projet ?>" class="btn btn-secondary" style="text-decoration: none;">
+                Annuler
             </a>
         </form>
     </div>
+</div>
+
 </body>
 </html>

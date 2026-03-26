@@ -3,190 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion - ONF</title>
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Connexion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
-        /* --- CHARTE GRAPHIQUE HERO DARK --- */
-        :root { 
-            --bg-dark: #0a0f0d;
-            --green: #2ecc71;
-            --green-hover: #27ae60;
-            --txt-primary: #ffffff;
-            --txt-secondary: #a0a0a0;
-            --red: #e74c3c;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #40D969;
+            --bg: #1A1A1A;
+            --bg-secondary: #2D2D2D;
+            --text: #E8E8E8;
+            --text-secondary: #B0B0B0;
+            --border: #3D3D3D;
+            --error: #FF6B6B;
         }
-
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            background-color: var(--bg-dark);
-            color: var(--txt-primary);
-            height: 100vh;
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            /* Fond forêt immersif identique aux autres pages */
-            background: linear-gradient(135deg, rgba(5,10,8,0.95) 0%, rgba(15,25,20,0.85) 100%),
-                        url('https://source.unsplash.com/1600x900/?forest,fog,night') no-repeat center center/cover;
+            justify-content: center;
         }
-
-        /* --- CARTE GLASSMORPHISM --- */
-        .login-card { 
-            background: rgba(30, 30, 30, 0.85); /* Fond semi-transparent */
-            backdrop-filter: blur(12px);         /* Flou d'arrière-plan */
-            -webkit-backdrop-filter: blur(12px);
-            padding: 40px; 
-            border-radius: 20px; 
-            border: 1px solid rgba(255,255,255,0.08); 
-            width: 340px; 
-            text-align: center; 
-            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-            position: relative;
+        
+        .login-card {
+            width: 100%;
+            max-width: 360px;
+            padding: 40px;
         }
-
-        /* L'icône Cadenas au dessus */
-        .icon-header {
-            font-size: 45px;
-            color: var(--green);
-            margin-bottom: 15px;
-            filter: drop-shadow(0 0 15px rgba(46, 204, 113, 0.4));
+        
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
-
-        h2 { 
-            color: white; 
-            margin: 0 0 30px 0;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        /* --- INPUTS TECH --- */
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .input-group i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #888;
-            transition: 0.3s;
-        }
-
-        input { 
-            width: 100%; 
-            padding: 14px 15px 14px 45px; /* Espace à gauche pour l'icône */
-            background: rgba(0, 0, 0, 0.4); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            color: white; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            outline: none;
+        
+        .subtitle {
+            color: var(--text-secondary);
             font-size: 15px;
-            transition: 0.3s;
+            margin-bottom: 32px;
         }
-
-        /* Focus : l'input et l'icône s'allument */
-        input:focus { 
-            border-color: var(--green); 
-            background: rgba(0, 0, 0, 0.6);
-            box-shadow: 0 0 10px rgba(46, 204, 113, 0.1);
+        
+        .input-group {
+            margin-bottom: 16px;
         }
-        input:focus + i, .input-group:focus-within i {
-            color: var(--green);
+        
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: var(--bg-secondary);
         }
-
-        /* --- BOUTON --- */
-        .btn { 
-            background: var(--green); 
-            color: #0a0f0d; /* Texte sombre pour contraste */
-            border: none; 
-            width: 100%; 
-            padding: 14px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 16px;
-            transition: 0.3s;
-            margin-top: 10px;
-            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.2);
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg);
+            box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.1);
         }
-        .btn:hover { 
-            background: var(--green-hover); 
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
             color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: opacity 0.2s;
         }
-
-        /* --- LIEN RETOUR --- */
-        .back-link {
-            display: inline-flex;
+        
+        .btn:hover {
+            opacity: 0.85;
+        }
+        
+        .error-msg {
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--error);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: flex;
             align-items: center;
             gap: 8px;
-            margin-top: 25px;
-            color: var(--txt-secondary);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: var(--text-secondary);
             text-decoration: none;
             font-size: 13px;
-            transition: 0.3s;
+            margin-top: 20px;
+            transition: color 0.2s;
         }
-        .back-link:hover { color: white; }
-
-        /* --- ERREUR --- */
-        .error-msg {
-            background: rgba(231, 76, 60, 0.15);
-            color: var(--red);
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(231, 76, 60, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+        
+        .back-link:hover {
+            color: var(--text);
         }
     </style>
 </head>
 <body>
 
     <div class="login-card">
-        <div class="icon-header">
-            <i class="fas fa-lock"></i>
-        </div>
-
-        <h2>Espace Agent</h2>
+        <h2>Connexion</h2>
+        <p class="subtitle">Accédez à votre compte</p>
         
-        <?php if(isset($erreur)): ?>
+        <?php if (isset($erreur)): ?>
             <div class="error-msg">
-                <i class="fas fa-exclamation-circle"></i> <?= htmlspecialchars($erreur) ?>
+                <i class="fas fa-circle-xmark"></i>
+                <?php echo htmlspecialchars($erreur); ?>
             </div>
         <?php endif; ?>
-
+        
         <form method="POST" action="index.php?page=login">
-            
-            <!-- ✅ Token CSRF pour la sécurité -->
-            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
             
             <div class="input-group">
-                <input type="email" name="email" placeholder="Email professionnel" required autocomplete="email">
-                <i class="fas fa-envelope"></i>
+                <input type="email" name="email" placeholder="Email" required>
             </div>
             
             <div class="input-group">
-                <input type="password" name="password" placeholder="Mot de passe" required autocomplete="current-password">
-                <i class="fas fa-key"></i>
+                <input type="password" name="password" placeholder="Mot de passe" required>
             </div>
             
             <button type="submit" class="btn">Se connecter</button>
+            
+            <a href="index.php?page=accueil" class="back-link">← Retour</a>
         </form>
-        
-        <a href="index.php?page=carte" class="back-link">
-            <i class="fas fa-arrow-left"></i> Retour à la carte publique
-        </a>
     </div>
 
 </body>

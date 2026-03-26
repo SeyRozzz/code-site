@@ -6,13 +6,11 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once 'config.php';
 
-// 🔐 SÉCURITÉ : Seuls les admins/superadmins
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'superadmin'])) {
     header("Location: index.php?page=accueil");
     exit();
 }
 
-// ✅ Générer token CSRF
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -39,7 +37,6 @@ if (!$projet) {
     exit();
 }
 
-// 1. Traitement AJOUT d'un forestier au projet
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'ajouter') {
     if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $message = "❌ Erreur de sécurité: token CSRF invalide";
@@ -53,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     VALUES (?, ?)
                 ");
                 $stmt->execute([$id_projet, $id_forestier]);
-                $message = "✅ Forestier affecté avec succès!";
+                $message = "Forestier affecté avec succès!";
             } catch (PDOException $e) {
                 if (strpos($e->getMessage(), '1146') !== false) {
                     // Table n'existe pas
@@ -68,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// 2. Traitement SUPPRESSION d'un forestier du projet
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'retirer') {
     if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $message = "❌ Erreur de sécurité: token CSRF invalide";
@@ -79,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             try {
                 $stmt = $pdo->prepare("DELETE FROM projets_forestiers WHERE id = ? AND id_projet = ?");
                 $stmt->execute([$id_affectation, $id_projet]);
-                $message = "✅ Forestier retiré du projet.";
+                $message = "Forestier retiré du projet.";
             } catch (PDOException $e) {
                 if (strpos($e->getMessage(), '1146') !== false) {
                     // Table n'existe pas
@@ -92,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// 3. Récupérer les forestiers déjà affectés
+
 $forestiers_affectes = [];
 try {
     $stmt = $pdo->prepare("
@@ -109,7 +105,6 @@ try {
     error_log("Table projets_forestiers n'existe pas encore: " . $e->getMessage());
 }
 
-// 4. Récupérer les forestiers NON affectés à ce projet
 $forestiers_libres = [];
 try {
     $ids_affectes = array_map(fn($f) => $f['user_id'], $forestiers_affectes);

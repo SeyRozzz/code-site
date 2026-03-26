@@ -1,18 +1,15 @@
 <?php
-// ajouterProjet.php - Ajouter un arbre
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 require_once 'config.php';
 
-// SÉCURITÉ : Seuls les forestiers et admins peuvent ajouter
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['forestier', 'admin', 'superadmin'])) {
     header("Location: index.php?page=login");
     exit();
 }
 
-// Générer un token CSRF pour le formulaire
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -20,7 +17,6 @@ if (empty($_SESSION['csrf_token'])) {
 $message = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Vérification CSRF
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $message = "Erreur de sécurité : jeton invalide.";
     } else {
@@ -30,9 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $lat = $_POST['latitude'] ?? '';
         $lon = $_POST['longitude'] ?? '';
         $id_projet = (int)($_POST['id_projet'] ?? 0);
-        $id_user = $_SESSION['user_id']; // ID de l'utilisateur connecté
+        $id_user = $_SESSION['user_id'];
 
-        // 🔒 SÉCURITÉ : Vérifier que le forestier a accès à ce projet
         if ($_SESSION['role'] === 'forestier') {
             $stmt = $pdo->prepare("
                 SELECT COUNT(*) FROM projets_forestiers 
@@ -42,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $has_access = $stmt->fetchColumn();
             
             if (!$has_access) {
-                $message = "❌ Vous n'avez pas accès à ce projet.";
+                $message = "Erreur : vous n'avez pas accès à ce projet.";
                 include 'ajouterVue.php';
                 exit();
             }
@@ -52,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "Veuillez remplir tous les champs obligatoires.";
         } else {
             try {
-                // Insertion avec les nouvelles colonnes (image_fde60b.png)
                 $sql = "INSERT INTO arbres (id_projet, id_createur, essence, hauteur, diametre, latitude, longitude) 
                         VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $pdo->prepare($sql);
@@ -68,8 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Récupérer la liste des projets pour le formulaire
-// 🔒 SÉCURITÉ : Les forestiers voient seulement leurs projets affectés
 if ($_SESSION['role'] === 'forestier') {
     $stmt = $pdo->prepare("
         SELECT p.id, p.nom 

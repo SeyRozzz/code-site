@@ -23,6 +23,7 @@ $router->addRoute('projets', 'ajouterProjet.php');
 $router->addRoute('supprimer_projet', 'supprimerProjet.php');
 $router->addRoute('gererProjet', 'gererProjet.php');         // 🆕 Gestion admin des projets
 $router->addRoute('affecterForestier', 'affecterForestier.php'); // 🆕 Affectation forestiers aux projets
+$router->addRoute('exportProjet', 'exportProjet.php');       // 🆕 Export PDF/CSV des projets
 
 // --- PANEL ADMINISTRATION ---
 $router->addRoute('admin', 'admin.php');
