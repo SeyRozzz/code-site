@@ -1,28 +1,61 @@
 <?php
-// changer_role.php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once 'config.php';
 
-if (!isset($_SESSION['role']) || ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'superadmin')) {
-    exit("Accès refusé");
+if (!isset($_SESSION['user_id'], $_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'superadmin'], true)) {
+    http_response_code(403);
+    exit('Acces refuse');
 }
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: index.php?page=admin&error=invalid_method');
+    exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id = (int)($_POST['id'] ?? 0);
-    $new_role = $_POST['role'] ?? '';
-    $token = $_POST['csrf_token'] ?? '';
+$id = (int)($_POST['id'] ?? 0);
+$new_role = $_POST['role'] ?? '';
+$token = $_POST['csrf_token'] ?? '';
 
-    if ($token === $_SESSION['csrf_token'] && in_array($new_role, ['forestier', 'admin'])) {
-        $stmt = $pdo->prepare("UPDATE utilisateurs SET role = ? WHERE id = ?");
-        $stmt->execute([$new_role, $id]);
-        header("Location: index.php?page=admin&success=rolechanged");
-        exit();
-    }
+if (empty($_SESSION['csrf_token']) || !is_string($token) || !hash_equals($_SESSION['csrf_token'], $token)) {
+    header('Location: index.php?page=admin&error=csrf');
+    exit();
 }
 
-header("Location: index.php?page=admin&error=invalid");
+if ($id <= 0 || !in_array($new_role, ['forestier', 'admin'], true)) {
+    header('Location: index.php?page=admin&error=invalid');
+    exit();
+}
+
+if ($id === (int)$_SESSION['user_id']) {
+    header('Location: index.php?page=admin&error=selfrole');
+    exit();
+}
+
+$stmt = $pdo->prepare("SELECT role FROM utilisateurs WHERE id = ?");
+$stmt->execute([$id]);
+$targetRole = $stmt->fetchColumn();
+
+if ($targetRole === false) {
+    header('Location: index.php?page=admin&error=notfound');
+    exit();
+}
+
+if ($targetRole === 'superadmin') {
+    header('Location: index.php?page=admin&error=forbidden');
+    exit();
+}
+
+try {
+    $stmt = $pdo->prepare("UPDATE utilisateurs SET role = ? WHERE id = ?");
+    $stmt->execute([$new_role, $id]);
+} catch (PDOException $e) {
+    error_log('Erreur changement role: ' . $e->getMessage());
+    header('Location: index.php?page=admin&error=invalid');
+    exit();
+}
+
+header('Location: index.php?page=admin&success=rolechanged');
 exit();

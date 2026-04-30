@@ -91,6 +91,8 @@
             font-size: 15px;
             font-family: inherit;
             transition: all 0.2s;
+            color: var(--text);
+            background: var(--bg-secondary);
         }
         
         select:focus {

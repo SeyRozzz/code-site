@@ -93,6 +93,24 @@
             margin: 0 auto;
             padding: 24px;
         }
+
+        .notice {
+            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 14px 16px;
+            font-size: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .notice.success {
+            background: rgba(64, 217, 105, 0.12);
+            color: var(--primary);
+        }
+
+        .notice.error {
+            background: rgba(255, 107, 107, 0.12);
+            color: var(--error);
+        }
         
         .table-wrapper {
             border-radius: 12px;
@@ -210,6 +228,14 @@
 </div>
 
 <div class="container">
+    <?php if (!empty($success_msg)): ?>
+        <div class="notice success"><?= htmlspecialchars($success_msg) ?></div>
+    <?php endif; ?>
+
+    <?php if (!empty($error_msg)): ?>
+        <div class="notice error"><?= htmlspecialchars($error_msg) ?></div>
+    <?php endif; ?>
+
     <div class="table-wrapper">
         <table>
             <thead>
@@ -232,14 +258,25 @@
                     </td>
                     <td>
                         <?php $isCurrentUser = ($u['email'] === ($_SESSION['email'] ?? '')); ?>
-                        <?php if ($u['role'] !== 'superadmin' && !$isCurrentUser): ?>
-                            <form method="POST" action="index.php?page=supprimer_user" style="display: inline;">
-                                <input type="hidden" name="id" value="<?= $u['id'] ?>">
-                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
-                                <button type="submit" class="action-btn delete delete-user" data-user="<?= htmlspecialchars($u['nom']) ?>">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
+                        <?php if ($u['role'] !== 'superadmin' && !$isCurrentUser && $_SESSION['role'] === 'superadmin'): ?>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <form method="POST" action="index.php?page=changer_role" style="display: inline;">
+                                    <input type="hidden" name="id" value="<?= (int)$u['id'] ?>">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+                                    <select name="role" onchange="this.form.submit()" style="padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 12px; cursor: pointer;">
+                                        <option value="">-- Changer rôle --</option>
+                                        <option value="forestier" <?= $u['role'] === 'forestier' ? 'selected' : '' ?>>Forestier</option>
+                                        <option value="admin" <?= $u['role'] === 'admin' ? 'selected' : '' ?>>Admin</option>
+                                    </select>
+                                </form>
+                                <form method="POST" action="index.php?page=supprimer_user" style="display: inline;">
+                                    <input type="hidden" name="id" value="<?= (int)$u['id'] ?>">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+                                    <button type="submit" class="action-btn delete delete-user" data-user="<?= htmlspecialchars($u['nom']) ?>">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         <?php elseif ($isCurrentUser): ?>
                             <span style="color: var(--text-secondary); font-size: 12px;">Votre compte</span>
                         <?php else: ?>

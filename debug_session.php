@@ -1,6 +1,15 @@
 <?php
-// 🔍 DEBUG - Vérification complète de la session et du CSRF
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$debugEnabled = getenv('APP_DEBUG') === '1';
+$isSuperadmin = isset($_SESSION['role']) && $_SESSION['role'] === 'superadmin';
+
+if (!$debugEnabled || !$isSuperadmin) {
+    http_response_code(404);
+    exit('Page introuvable');
+}
 
 echo "<h1>🔍 Diagnostic de la Session & CSRF</h1>";
 echo "<pre>";

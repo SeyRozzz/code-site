@@ -60,6 +60,11 @@
             font-family: inherit;
             transition: all 0.2s;
             background: var(--bg-secondary);
+            color: var(--text);
+        }
+        
+        input::placeholder {
+            color: var(--text-secondary);
         }
         
         input:focus {

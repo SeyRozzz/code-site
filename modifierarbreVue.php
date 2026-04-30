@@ -82,7 +82,12 @@
             font-size: 15px;
             font-family: inherit;
             background: var(--bg-secondary);
+            color: var(--text);
             transition: all 0.2s;
+        }
+        
+        input::placeholder {
+            color: var(--text-secondary);
         }
         
         input:focus, select:focus {
@@ -146,7 +151,7 @@
         <?php endif; ?>
 
         <form method="POST">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
             
             <div class="form-group">
                 <label>Projet</label>
@@ -166,8 +171,8 @@
                     $essences = ["Chêne", "Hêtre", "Sapin", "Épicéa", "Pin", "Mélèze", "Bouleau", "Frêne", "Autre"];
                     foreach($essences as $e): 
                     ?>
-                        <option value="<?= $e ?>" <?= ($arbre['essence'] == $e) ? 'selected' : '' ?>>
-                            <?= $e ?>
+                        <option value="<?= htmlspecialchars($e) ?>" <?= ($arbre['essence'] == $e) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($e) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -187,28 +192,16 @@
             <div class="row">
                 <div class="form-group">
                     <label>Latitude</label>
-                    <input type="text" name="latitude" value="<?= $arbre['latitude'] ?>" required>
+                    <input type="text" name="latitude" value="<?= htmlspecialchars((string) $arbre['latitude']) ?>" required>
                 </div>
                 <div class="form-group">
                     <label>Longitude</label>
-                    <input type="text" name="longitude" value="<?= $arbre['longitude'] ?>" required>
+                    <input type="text" name="longitude" value="<?= htmlspecialchars((string) $arbre['longitude']) ?>" required>
                 </div>
             </div>
 
             <button type="submit" class="btn">Enregistrer</button>
             <a href="index.php?page=carte" class="link">Annuler</a>
-        </form>
-    </div>
-</body>
-</html>
-                    <label>Longitude</label>
-                    <i class="fas fa-map-pin input-icon" style="top:38px;"></i>
-                    <input type="text" name="longitude" value="<?= $arbre['longitude'] ?>" required style="padding-left:40px;">
-                </div>
-            </div>
-
-            <button type="submit" class="btn-submit">Mettre à jour l'inventaire</button>
-            <a href="index.php?page=carte" class="btn-cancel"><i class="fas fa-arrow-left"></i> Retour à la carte</a>
         </form>
     </div>
 </body>

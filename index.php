@@ -19,7 +19,7 @@ $router->addRoute('modifier', 'modifierarbre.php');
 $router->addRoute('supprimer', 'supprimer.php');
 
 // --- GESTION DES PROJETS (Nouvelle BDD) ---
-$router->addRoute('projets', 'ajouterProjet.php');
+$router->addRoute('projets', 'gererProjet.php');
 $router->addRoute('supprimer_projet', 'supprimerProjet.php');
 $router->addRoute('gererProjet', 'gererProjet.php');         // 🆕 Gestion admin des projets
 $router->addRoute('affecterForestier', 'affecterForestier.php'); // 🆕 Affectation forestiers aux projets

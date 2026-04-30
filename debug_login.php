@@ -1,6 +1,16 @@
 <?php
-// 🔍 DEBUG - À SUPPRIMER APRÈS VÉRIFICATION
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$debugEnabled = getenv('APP_DEBUG') === '1';
+$isSuperadmin = isset($_SESSION['role']) && $_SESSION['role'] === 'superadmin';
+
+if (!$debugEnabled || !$isSuperadmin) {
+    http_response_code(404);
+    exit('Page introuvable');
+}
+
 require_once 'config.php';
 
 echo "<h1>🔍 DEBUG - Test de Connexion</h1>";

@@ -82,7 +82,12 @@
             font-size: 15px;
             font-family: inherit;
             background: var(--bg-secondary);
+            color: var(--text);
             transition: all 0.2s;
+        }
+        
+        input::placeholder {
+            color: var(--text-secondary);
         }
         
         input:focus, select:focus {

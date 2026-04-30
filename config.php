@@ -1,7 +1,5 @@
 <?php
-// fichier pour se connecter bdd
-// ⚠️ IMPORTANT: Utilisez des variables d'environnement en production!
-// Exemple: $host = getenv('DB_HOST') ?: 'localhost';
+
 $host = getenv('DB_HOST') ?: 'mysql-locaris.alwaysdata.net';
 $db   = getenv('DB_NAME') ?: 'locaris_bdd';
 $user = getenv('DB_USER') ?: 'locaris';

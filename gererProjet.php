@@ -31,7 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $stmt->execute([$nom, $_SESSION['user_id']]);
                 $message = "Projet créé avec succès!";
             } catch (PDOException $e) {
-                $message = "❌ Erreur: " . $e->getMessage();
+                error_log("Erreur creation projet: " . $e->getMessage());
+                $message = "❌ Erreur technique lors de la creation du projet.";
             }
         }
     }

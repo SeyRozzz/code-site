@@ -86,6 +86,11 @@
             font-size: 15px;
             font-family: inherit;
             transition: all 0.2s;
+            color: var(--text);
+        }
+        
+        .form-group input::placeholder {
+            color: var(--text-secondary);
         }
         
         .form-group input:focus {

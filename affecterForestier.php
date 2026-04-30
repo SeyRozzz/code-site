@@ -77,11 +77,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $stmt->execute([$id_affectation, $id_projet]);
                 $message = "Forestier retiré du projet.";
             } catch (PDOException $e) {
+                error_log("Erreur retrait forestier: " . $e->getMessage());
                 if (strpos($e->getMessage(), '1146') !== false) {
                     // Table n'existe pas
                     $message = "⚠️ La table projets_forestiers n'existe pas encore.";
                 } else {
-                    $message = "❌ Erreur: " . $e->getMessage();
+                    $message = "❌ Erreur technique lors du retrait.";
                 }
             }
         }

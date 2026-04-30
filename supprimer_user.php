@@ -1,35 +1,59 @@
 <?php
-// supprimer_user.php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once 'config.php';
 
-if (!isset($_SESSION['role']) || ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'superadmin')) {
-    exit("Accès refusé");
+if (!isset($_SESSION['user_id'], $_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'superadmin'], true)) {
+    http_response_code(403);
+    exit('Acces refuse');
 }
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-if (isset($_GET['token'])) {
-$token = $_GET['token'] ?? '';
-if ($token !== $_SESSION['csrf_token']) {
-    header("Location: index.php?page=admin&error=csrf");
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: index.php?page=admin&error=invalid_method');
     exit();
 }
 
-if (isset($_GET['id'])) {
-    $id = (int)$_GET['id'];
-    
-    // Empêcher de se supprimer soi-même
-    if ($id === (int)$_SESSION['user_id']) {
-        header("Location: index.php?page=admin&error=selfdelete");
-        exit();
-    }
-
-    $stmt = $pdo->prepare("DELETE FROM utilisateurs WHERE id = ?");
-    $stmt->execute([$id]);
+$token = $_POST['csrf_token'] ?? '';
+if (empty($_SESSION['csrf_token']) || !is_string($token) || !hash_equals($_SESSION['csrf_token'], $token)) {
+    header('Location: index.php?page=admin&error=csrf');
+    exit();
 }
 
-header("Location: index.php?page=admin&success=deleted");
+$id = (int)($_POST['id'] ?? 0);
+if ($id <= 0) {
+    header('Location: index.php?page=admin&error=invalid');
+    exit();
+}
+
+if ($id === (int)$_SESSION['user_id']) {
+    header('Location: index.php?page=admin&error=selfdelete');
+    exit();
+}
+
+$stmt = $pdo->prepare("SELECT role FROM utilisateurs WHERE id = ?");
+$stmt->execute([$id]);
+$targetRole = $stmt->fetchColumn();
+
+if ($targetRole === false) {
+    header('Location: index.php?page=admin&error=notfound');
+    exit();
+}
+
+if ($targetRole === 'superadmin') {
+    header('Location: index.php?page=admin&error=forbidden');
+    exit();
+}
+
+try {
+    $stmt = $pdo->prepare("DELETE FROM utilisateurs WHERE id = ?");
+    $stmt->execute([$id]);
+} catch (PDOException $e) {
+    error_log('Erreur suppression utilisateur: ' . $e->getMessage());
+    header('Location: index.php?page=admin&error=delete_failed');
+    exit();
+}
+
+header('Location: index.php?page=admin&success=deleted');
 exit();
